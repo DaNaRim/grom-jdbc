@@ -1,4 +1,5 @@
 import java.sql.*;
+import java.util.Date;
 
 public class JDBCFirstStep {
     //1. DB Driver +
@@ -9,13 +10,13 @@ public class JDBCFirstStep {
     //6. close all the connection +
 
     private static final String JDBC_DRIVER = "oracle.jdbc.driver.OracleDriver";
-    private static final String DB_URL = "jdbc:oracle:thin:@gromcode-lessons.c88oq4boivpv.eu-west-2.rds.amazonaws.com:1521:ORCL";
+    private static final String DB_URL = "jdbc:oracle:thin:@gromcode-lessons.c2nwr4ze1uqa.us-east-2.rds.amazonaws.com:1521:ORCL";
 
     private static final String USER = "main";
-    private static final String PASS = "AWS_Admin";
+    private static final String PASS = "PyP2p02rIZ9uyMBpTBwW";
 
     public static void main(String[] args) {
-        try (Connection connection = DriverManager.getConnection(DB_URL, USER, PASS); Statement statement = connection.createStatement()){
+        try (Connection connection = DriverManager.getConnection(DB_URL, USER, PASS); Statement statement = connection.createStatement()) {
             try {
                 Class.forName(JDBC_DRIVER);
             } catch (ClassNotFoundException e) {
@@ -23,13 +24,21 @@ public class JDBCFirstStep {
                 return;
             }
 
-            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM TEST")){
+            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM Orders WHERE PRICE > 5000")) {
                 while (resultSet.next()) {
-                    System.out.println("Object found");
+                    long id = resultSet.getLong(1);
+                    String productName = resultSet.getString(2);
+                    int price = resultSet.getInt(3);
+                    Date dateOrdered = resultSet.getDate(4);
+                    Date dateConfirmed = resultSet.getDate(5);
+
+                    Order order = new Order(id, productName, price, dateOrdered, dateConfirmed);
+
+                    System.out.println(order);
                 }
             }
         } catch (SQLException e) {
-            System.out.println("Something went wrong");
+            System.err.println("Something went wrong");
             e.printStackTrace();
         }
     }
