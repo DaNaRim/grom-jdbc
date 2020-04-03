@@ -1,3 +1,5 @@
+package lesson1_2;
+
 import java.sql.*;
 
 public class JDBCExamples {
