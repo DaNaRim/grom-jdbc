@@ -1,6 +1,7 @@
 package lesson1_2.homework;
 
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -31,5 +32,32 @@ public class Solution {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public ResultSet getAllProducts() {
+        try (Statement statement = DriverManager.getConnection(DB_URL, USER, PASS).createStatement()) {
+            return statement.executeQuery("SELECT * FROM PRODUCT");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public ResultSet getProductByPrice() {
+        try (Statement statement = DriverManager.getConnection(DB_URL, USER, PASS).createStatement()) {
+            return statement.executeQuery("SELECT * FROM PRODUCT WHERE PRICE <= 100");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public ResultSet getProductsByDescription() {
+        try (Statement statement = DriverManager.getConnection(DB_URL, USER, PASS).createStatement()) {
+            return statement.executeQuery("SELECT * FROM PRODUCT WHERE LENGTH(DESCRIPTION) > 50");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
