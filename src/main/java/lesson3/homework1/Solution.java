@@ -1,7 +1,5 @@
 package lesson3.homework1;
 
-import lesson3.Product;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
