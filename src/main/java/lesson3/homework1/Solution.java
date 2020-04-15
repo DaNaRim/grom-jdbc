@@ -9,7 +9,7 @@ public class Solution {
     private static final String USER = "main";
     private static final String PASS = "PyP2p02rIZ9uyMBpTBwW";
 
-    public List<Product> findProductsByPrice(int price, int delta) {
+    public List<Product> findProductsByPrice(int price, int delta) throws SQLException {
         try (PreparedStatement ps = getConnection().prepareStatement("SELECT * FROM PRODUCT WHERE PRICE BETWEEN ? AND ?")) {
             ps.setInt(1, price - delta);
             ps.setInt(2, price + delta);
@@ -21,9 +21,8 @@ public class Solution {
             }
             return products;
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new SQLException("Something went wrong.");
         }
-        return null;
     }
 
     public List<Product> findProductsByName(String word) throws Exception {
@@ -39,12 +38,11 @@ public class Solution {
             }
             return products;
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new SQLException("Something went wrong.");
         }
-        return null;
     }
 
-    public List<Product> findProductsWithEmptyDescription() {
+    public List<Product> findProductsWithEmptyDescription() throws SQLException {
         try (Statement st = getConnection().createStatement()) {
             ResultSet rs = st.executeQuery("SELECT * FROM PRODUCT WHERE DESCRIPTION IS NULL");
 
@@ -54,9 +52,8 @@ public class Solution {
             }
             return products;
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new SQLException("Something went wrong.");
         }
-        return null;
     }
 
     private Connection getConnection() throws SQLException {
@@ -65,14 +62,14 @@ public class Solution {
 
     private void validateWord(String word) throws Exception {
         if (word.split(" ").length > 1) {
-            throw new Exception("Word " + word +" is incorrect. There should be no more than one word");
+            throw new Exception("Word " + word +" is incorrect. There should be no more than one word.");
         }
         if (word.length() < 3) {
-            throw new Exception("Word " + word +" is incorrect. The word is too short. Must be more than two characters");
+            throw new Exception("Word " + word +" is incorrect. The word is too short. Must be more than two characters.");
         }
         for (char ch : word.toCharArray()) {
             if (Character.isDigit(ch)) {
-                throw new Exception("Word " + word +" is incorrect. The word must not contain special characters");
+                throw new Exception("Word " + word +" is incorrect. The word must not contain special characters.");
             }
         }
     }
