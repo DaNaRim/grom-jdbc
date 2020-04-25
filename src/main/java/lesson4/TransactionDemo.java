@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class TransactionDemo {
@@ -22,19 +21,6 @@ public class TransactionDemo {
     private static final String DB_URL = "jdbc:oracle:thin:@gromcode-lessons.c2nwr4ze1uqa.us-east-2.rds.amazonaws.com:1521:ORCL";
     private static final String USER = "main";
     private static final String PASS = "PyP2p02rIZ9uyMBpTBwW";
-
-    public static void main(String[] args) {
-        Product product1 = new Product(4, "!!!", "!!!!", 7777);
-        Product product2 = new Product(5, "!!!", "!!!!", 7777);
-        Product product3 = new Product(5, "!!!", "!!!!", 7777);
-
-        List<Product> products = new ArrayList<>();
-        products.add(product1);
-        products.add(product2);
-        products.add(product3);
-
-        save(products);
-    }
 
     public static void save(List<Product> products) {
         try (Connection conn = getConnection()) {
