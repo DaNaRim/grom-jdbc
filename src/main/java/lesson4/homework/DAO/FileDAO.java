@@ -94,7 +94,7 @@ public class FileDAO extends DaoTools {
             ResultSet rs = ps.executeQuery();
 
             HashSet<File> files = new HashSet<>();
-            if (rs.next()) {
+            while (rs.next()) {
                 files.add(new File(
                         rs.getLong(1),
                         rs.getString(2),
