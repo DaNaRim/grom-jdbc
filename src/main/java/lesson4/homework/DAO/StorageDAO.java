@@ -31,7 +31,8 @@ public class StorageDAO extends DaoTools {
             storage.setId(storageId);
             return storage;
         } catch (SQLException e) {
-            throw new InternalServerException("An error occurred while trying to create the storage: " + e);
+            throw new InternalServerException("An error occurred while trying to create the storage: " +
+                    e.getMessage());
         }
     }
 
@@ -39,7 +40,8 @@ public class StorageDAO extends DaoTools {
         try (Connection conn = getConnection()) {
             delete(id, conn);
         } catch (SQLException | BadRequestException e) {
-            throw new InternalServerException("An error occurred while trying to delete the storage " + id + " : " + e);
+            throw new InternalServerException("An error occurred while trying to delete the storage " + id + " : " +
+                    e.getMessage());
         }
     }
 
@@ -63,7 +65,7 @@ public class StorageDAO extends DaoTools {
             return storage;
         } catch (SQLException e) {
             throw new InternalServerException("An error occurred while trying to update the storage " +
-                    storage.getId() + " : " + e);
+                    storage.getId() + " : " + e.getMessage());
         }
     }
 
@@ -81,7 +83,8 @@ public class StorageDAO extends DaoTools {
                     rs.getLong(4),
                     rs.getLong(5));
         } catch (SQLException e) {
-            throw new InternalServerException("An error occurred while trying to find storage with id " + id + " : " + e);
+            throw new InternalServerException("An error occurred while trying to find storage with id " + id + " : " +
+                    e.getMessage());
         }
     }
 

@@ -38,7 +38,7 @@ public class FileDAO extends DaoTools {
             return file;
         } catch (SQLException e) {
             throw new InternalServerException("An error occurred while trying to update the file " + file.getId() +
-                    " : " + e);
+                    " : " + e.getMessage());
         }
     }
 
@@ -56,7 +56,8 @@ public class FileDAO extends DaoTools {
             }
             throw new BadRequestException("File with id " + id + " is missing");
         } catch (SQLException e) {
-            throw new InternalServerException("An error occurred while trying to find file with id " + id + " : " + e);
+            throw new InternalServerException("An error occurred while trying to find file with id " + id + " : " +
+                    e.getMessage());
         }
     }
 
@@ -65,7 +66,7 @@ public class FileDAO extends DaoTools {
             transferAllFiles(storageFrom, storageTo, conn);
         } catch (SQLException e) {
             throw new InternalServerException("An error occurred while trying to transfer files from storage " +
-                    storageFrom.getId() + " to storage " + storageTo.getId() + " : " + e);
+                    storageFrom.getId() + " to storage " + storageTo.getId() + " : " + e.getMessage());
         }
     }
 
@@ -74,17 +75,17 @@ public class FileDAO extends DaoTools {
             transferFile(storageFrom, storageTo, id, conn);
         } catch (SQLException | BadRequestException e) {
             throw new InternalServerException("An error occurred while trying to transfer file " + id + " from storage " +
-                    storageFrom.getId() + " to storage " + storageTo.getId() + " : " + e);
+                    storageFrom.getId() + " to storage " + storageTo.getId() + " : " + e.getMessage());
         }
     }
 
     public static void checkFileName(Storage storage, File file) throws BadRequestException, InternalServerException {
         try (PreparedStatement ps = getConnection().prepareStatement("SELECT * FROM FILES WHERE NAME = ? AND STORAGE_ID = ?")) {
-            ps.setLong(1, file.getId());
+            ps.setString(1, file.getName());
             ps.setLong(2, storage.getId());
             if (ps.executeUpdate() == 1) throw new BadRequestException("File already exists");
         } catch (SQLException e) {
-            throw new InternalServerException("An error occurred while trying to check the file " + e);
+            throw new InternalServerException("An error occurred while trying to check the file " + e.getMessage());
         }
     }
 
@@ -105,7 +106,7 @@ public class FileDAO extends DaoTools {
             return files;
         } catch (SQLException | BadRequestException e) {
             throw new InternalServerException("An error occurred while trying to get all files from storage " + id +
-                    " : " + e);
+                    " : " + e.getMessage());
         }
     }
 

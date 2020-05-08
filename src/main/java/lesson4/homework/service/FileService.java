@@ -17,8 +17,7 @@ public class FileService {
 
             return FileDAO.save(storage, file);
         } catch (BadRequestException e) {
-            throw new BadRequestException("Cannot put file " + file.getId() + " in storage " + storage.getId() + ": " +
-                    e);
+            throw new BadRequestException("Cannot put file in storage " + storage.getId() + " : " + e.getMessage());
         }
     }
 
@@ -29,7 +28,7 @@ public class FileService {
             FileDAO.delete(storage, file);
         } catch (BadRequestException e) {
             throw new BadRequestException("Cannot delete file " + file.getId() + " from storage " + storage.getId() +
-                    " : " + e);
+                    " : " + e.getMessage());
         }
     }
 
@@ -59,7 +58,7 @@ public class FileService {
             FileDAO.transferFile(storageFrom, storageTo, id);
         } catch (BadRequestException e) {
             throw new BadRequestException("Cannot transfer file " + id + " from storage " + storageFrom.getId() +
-                    " to storage " + storageTo.getId() + " : " + e);
+                    " to storage " + storageTo.getId() + " : " + e.getMessage());
         }
     }
 
@@ -74,7 +73,7 @@ public class FileService {
 
             return FileDAO.update(file);
         } catch (BadRequestException e) {
-            throw new BadRequestException("Cannot update file " + file.getId() + " : " + e);
+            throw new BadRequestException("Cannot update file " + file.getId() + " : " + e.getMessage());
         }
     }
 
