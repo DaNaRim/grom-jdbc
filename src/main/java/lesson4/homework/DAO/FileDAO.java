@@ -1,0 +1,202 @@
+package lesson4.homework.DAO;
+
+import lesson4.homework.Exceptions.BadRequestException;
+import lesson4.homework.Exceptions.InternalServerException;
+import lesson4.homework.model.File;
+import lesson4.homework.model.Storage;
+
+import java.sql.*;
+import java.util.HashSet;
+import java.util.UUID;
+
+public class FileDAO extends DaoTools {
+
+    public static File save(Storage storage, File file) throws InternalServerException {
+        try (Connection conn = getConnection()) {
+            return saveFile(storage, file, conn);
+        } catch (SQLException e) {
+            throw new InternalServerException(e.getMessage());
+        }
+    }
+
+    public static void delete(Storage storage, File file) throws InternalServerException {
+        try (Connection conn = getConnection()) {
+            deleteFile(storage, file, conn);
+        } catch (SQLException e) {
+            throw new InternalServerException(e.getMessage());
+        }
+    }
+
+    public static File update(File file) throws InternalServerException {
+        try (PreparedStatement ps = getConnection().prepareStatement("UPDATE FILES SET NAME = ? FORMAT = ? FILE_SIZE = ? STORAGE_ID = ? WHERE ID = ?")) {
+            ps.setString(1, file.getName());
+            ps.setLong(2, file.getSize());
+            ps.setLong(3, file.getStorage().getId());
+            ps.setLong(4, file.getId());
+            ps.executeUpdate();
+
+            return file;
+        } catch (SQLException e) {
+            throw new InternalServerException("An error occurred while trying to update the file " + file.getId() +
+                    " : " + e);
+        }
+    }
+
+    public static File findById(long id) throws BadRequestException, InternalServerException {
+        try (PreparedStatement ps = getConnection().prepareStatement("SELECT * FROM FILES WHERE ID = ?")) {
+            ps.setLong(1, id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return new File(
+                        rs.getLong(1),
+                        rs.getString(2),
+                        rs.getString(3),
+                        rs.getLong(4),
+                        StorageDAO.findById(rs.getLong(5)));
+            }
+            throw new BadRequestException("File with id " + id + " is missing");
+        } catch (SQLException e) {
+            throw new InternalServerException("An error occurred while trying to find file with id " + id + " : " + e);
+        }
+    }
+
+    public static void transferAll(Storage storageFrom, Storage storageTo) throws InternalServerException {
+        try (Connection conn = getConnection()) {
+            transferAllFiles(storageFrom, storageTo, conn);
+        } catch (SQLException e) {
+            throw new InternalServerException("An error occurred while trying to transfer files from storage " +
+                    storageFrom.getId() + " to storage " + storageTo.getId() + " : " + e);
+        }
+    }
+
+    public static void transferFile(Storage storageFrom, Storage storageTo, long id) throws InternalServerException {
+        try (Connection conn = getConnection()) {
+            transferFile(storageFrom, storageTo, id, conn);
+        } catch (SQLException | BadRequestException e) {
+            throw new InternalServerException("An error occurred while trying to transfer file " + id + " from storage " +
+                    storageFrom.getId() + " to storage " + storageTo.getId() + " : " + e);
+        }
+    }
+
+    public static void checkFileName(Storage storage, File file) throws BadRequestException, InternalServerException {
+        try (PreparedStatement ps = getConnection().prepareStatement("SELECT * FROM FILES WHERE NAME = ? AND STORAGE_ID = ?")) {
+            ps.setLong(1, file.getId());
+            ps.setLong(2, storage.getId());
+            if (ps.executeUpdate() == 1) throw new BadRequestException("File already exists");
+        } catch (SQLException e) {
+            throw new InternalServerException("An error occurred while trying to check the file " + e);
+        }
+    }
+
+    public static HashSet<File> getFilesByStorageId(long id) throws InternalServerException {
+        try (PreparedStatement ps = getConnection().prepareStatement("SELECT * FROM FILES WHERE STORAGE_ID = ?")) {
+            ps.setLong(1, id);
+            ResultSet rs = ps.executeQuery();
+
+            HashSet<File> files = new HashSet<>();
+            if (rs.next()) {
+                files.add(new File(
+                        rs.getLong(1),
+                        rs.getString(2),
+                        rs.getString(3),
+                        rs.getLong(4),
+                        StorageDAO.findById(rs.getLong(5))));
+            }
+            return files;
+        } catch (SQLException | BadRequestException e) {
+            throw new InternalServerException("An error occurred while trying to get all files from storage " + id +
+                    " : " + e);
+        }
+    }
+
+    private static File saveFile(Storage storage, File file, Connection conn)
+            throws SQLException, InternalServerException {
+        try (PreparedStatement ps = conn.prepareStatement("INSERT INTO FILES VALUES(?, ?, ?, ?, ?)")) {
+            conn.setAutoCommit(false);
+
+            long fileId = UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE;
+
+            ps.setLong(1, fileId);
+            ps.setString(2, file.getName());
+            ps.setString(3, file.getFormat());
+            ps.setLong(4, file.getSize());
+            ps.setLong(5, storage.getId());
+            ps.executeUpdate();
+
+            file.setId(fileId);
+            file.setStorageId(storage.getId());
+
+            storage.setFreeSpace(storage.getFreeSpace() - file.getSize());
+            StorageDAO.update(storage);
+
+            conn.commit();
+            return file;
+        } catch (SQLException | InternalServerException e) {
+            conn.rollback();
+            throw e;
+        }
+    }
+
+    private static void deleteFile(Storage storage, File file, Connection conn)
+            throws SQLException, InternalServerException {
+        try (PreparedStatement ps = conn.prepareStatement("DELETE FROM FILES WHERE ID = ?")) {
+            conn.setAutoCommit(false);
+
+            ps.setLong(1, file.getId());
+            ps.executeUpdate();
+
+            storage.setFreeSpace(storage.getFreeSpace() + file.getSize());
+            StorageDAO.update(storage);
+
+            conn.commit();
+        } catch (SQLException | InternalServerException e) {
+            conn.rollback();
+            throw e;
+        }
+    }
+
+    private static void transferAllFiles(Storage storageFrom, Storage storageTo, Connection conn)
+            throws SQLException, InternalServerException {
+        try {
+            conn.setAutoCommit(false);
+
+            for (File file : getFilesByStorageId(storageFrom.getId())) {
+                file.setStorageId(storageTo.getId());
+                update(file);
+            }
+
+            long filesSize = storageFrom.getStorageSize() - storageFrom.getFreeSpace();
+
+            storageFrom.setFreeSpace(storageFrom.getStorageSize());
+            StorageDAO.update(storageFrom);
+            storageTo.setFreeSpace(storageTo.getFreeSpace() - filesSize);
+            StorageDAO.update(storageTo);
+
+            conn.commit();
+        } catch (SQLException | InternalServerException e) {
+            conn.rollback();
+            throw e;
+        }
+    }
+
+    private static void transferFile(Storage storageFrom, Storage storageTo, long id, Connection conn)
+            throws SQLException, BadRequestException, InternalServerException {
+        try {
+            conn.setAutoCommit(false);
+
+            File file = findById(id);
+            file.setStorageId(storageTo.getId());
+            update(file);
+
+            storageFrom.setFreeSpace(storageFrom.getFreeSpace() + file.getSize());
+            StorageDAO.update(storageFrom);
+            storageTo.setFreeSpace(storageTo.getFreeSpace() - file.getSize());
+            StorageDAO.update(storageTo);
+
+            conn.commit();
+        } catch (SQLException | BadRequestException | InternalServerException e) {
+            conn.rollback();
+            throw e;
+        }
+    }
+}
