@@ -90,9 +90,9 @@ public class FileDAO extends DaoTools {
         }
     }
 
-    public static HashSet<File> getFilesByStorageId(long id) throws InternalServerException {
+    public static HashSet<File> getFilesByStorage(Storage storage) throws InternalServerException {
         try (PreparedStatement ps = getConnection().prepareStatement("SELECT * FROM FILES WHERE STORAGE_ID = ?")) {
-            ps.setLong(1, id);
+            ps.setLong(1, storage.getId());
             ResultSet rs = ps.executeQuery();
 
             HashSet<File> files = new HashSet<>();
@@ -102,12 +102,12 @@ public class FileDAO extends DaoTools {
                         rs.getString(2),
                         rs.getString(3),
                         rs.getLong(4),
-                        StorageDAO.findById(rs.getLong(5))));
+                        storage));
             }
             return files;
-        } catch (SQLException | BadRequestException e) {
-            throw new InternalServerException("An error occurred while trying to get all files from storage " + id +
-                    " : " + e.getMessage());
+        } catch (SQLException e) {
+            throw new InternalServerException("An error occurred while trying to get all files from storage " +
+                    storage.getId() + " : " + e.getMessage());
         }
     }
 
@@ -159,13 +159,12 @@ public class FileDAO extends DaoTools {
 
     private static void transferAllFiles(Storage storageFrom, Storage storageTo, Connection conn)
             throws SQLException, InternalServerException {
-        try {
+        try (PreparedStatement ps = conn.prepareStatement("UPDATE FILES SET STORAGE_ID = ? WHERE STORAGE_ID = ?")) {
             conn.setAutoCommit(false);
 
-            for (File file : getFilesByStorageId(storageFrom.getId())) {
-                file.setStorage(storageTo);
-                update(file);
-            }
+            ps.setLong(1, storageTo.getId());
+            ps.setLong(2, storageFrom.getId());
+            ps.executeUpdate();
 
             long filesSize = storageFrom.getStorageSize() - storageFrom.getFreeSpace();
 
@@ -183,12 +182,14 @@ public class FileDAO extends DaoTools {
 
     private static void transferFile(Storage storageFrom, Storage storageTo, long id, Connection conn)
             throws SQLException, BadRequestException, InternalServerException {
-        try {
+        try (PreparedStatement ps = conn.prepareStatement("UPDATE FILES SET STORAGE_ID = ? WHERE ID = ?")) {
             conn.setAutoCommit(false);
 
+            ps.setLong(1, storageTo.getId());
+            ps.setLong(2, id);
+            ps.executeUpdate();
+
             File file = findById(id);
-            file.setStorage(storageTo);
-            update(file);
 
             storageFrom.setFreeSpace(storageFrom.getFreeSpace() + file.getSize());
             StorageDAO.update(storageFrom);

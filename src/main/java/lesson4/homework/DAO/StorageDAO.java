@@ -6,6 +6,7 @@ import lesson4.homework.model.File;
 import lesson4.homework.model.Storage;
 
 import java.sql.*;
+import java.util.HashSet;
 import java.util.UUID;
 
 public class StorageDAO extends DaoTools {
@@ -76,12 +77,17 @@ public class StorageDAO extends DaoTools {
             if (!rs.next()) {
                 throw new BadRequestException("Storage with id " + id + " is missing");
             }
-            return new Storage(
+            Storage storage = new Storage(
                     rs.getLong(1),
+                    null,
                     rs.getString(2).split(", "),
                     rs.getString(3),
                     rs.getLong(4),
                     rs.getLong(5));
+            HashSet<File> files = FileDAO.getFilesByStorage(storage);
+            storage.setFiles(files);
+
+            return storage;
         } catch (SQLException e) {
             throw new InternalServerException("An error occurred while trying to find storage with id " + id + " : " +
                     e.getMessage());
@@ -93,8 +99,9 @@ public class StorageDAO extends DaoTools {
         try (PreparedStatement ps = conn.prepareStatement("DELETE STORAGE WHERE ID = ?")) {
             conn.setAutoCommit(false);
 
-            for (File file : FileDAO.getFilesByStorageId(id)) {
-                FileDAO.delete(findById(id), file);
+            Storage storage = findById(id);
+            for (File file : storage.getFiles()) {
+                FileDAO.delete(storage, file);
             }
 
             ps.setLong(4, id);

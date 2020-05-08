@@ -62,7 +62,7 @@ public class File {
                 ", name='" + name + '\'' +
                 ", format='" + format + '\'' +
                 ", size=" + size +
-                ", storage=" + storage +
+                ", storage=" + storage.getId() +
                 '}';
     }
 }
