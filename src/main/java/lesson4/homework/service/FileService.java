@@ -35,6 +35,7 @@ public class FileService {
     public static void transferAll(Storage storageFrom, Storage storageTo)
             throws BadRequestException, InternalServerException {
         try {
+            checkStorages(storageFrom, storageTo);
             checkFilesFormat(storageFrom, storageTo);
             checkSize(storageFrom, storageTo);
             checkFiles(storageFrom, storageTo);
@@ -50,7 +51,7 @@ public class FileService {
             throws BadRequestException, InternalServerException {
         try {
             File file = FileDAO.findById(id);
-
+            checkStorages(storageFrom, storageTo);
             checkFileFormat(storageTo, file);
             checkSize(storageTo, file);
             FileDAO.checkFileName(storageTo, file);
@@ -91,7 +92,7 @@ public class FileService {
     private static void checkFilesFormat(Storage storageFrom, Storage storageTo)
             throws BadRequestException, InternalServerException {
         for (File file : FileDAO.getFilesByStorageId(storageFrom.getId())) {
-            if (file != null) checkFileFormat(storageTo, file);
+            checkFileFormat(storageTo, file);
         }
     }
 
@@ -110,6 +111,15 @@ public class FileService {
             throws BadRequestException, InternalServerException {
         for (File file : FileDAO.getFilesByStorageId(storageFrom.getId())) {
             FileDAO.checkFileName(storageTo, file);
+        }
+    }
+
+    private static void checkStorages(Storage storage1, Storage storage2) throws BadRequestException, InternalServerException {
+        if (FileDAO.getFilesByStorageId(storage1.getId()).isEmpty()) {
+            throw new BadRequestException("Nothing to transfer");
+        }
+        if (storage1.getId() == storage2.getId()) {
+            throw new BadRequestException("Transfer to the same storage");
         }
     }
 }

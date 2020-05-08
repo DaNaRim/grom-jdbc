@@ -28,11 +28,12 @@ public class FileDAO extends DaoTools {
     }
 
     public static File update(File file) throws InternalServerException {
-        try (PreparedStatement ps = getConnection().prepareStatement("UPDATE FILES SET NAME = ? FORMAT = ? FILE_SIZE = ? STORAGE_ID = ? WHERE ID = ?")) {
+        try (PreparedStatement ps = getConnection().prepareStatement("UPDATE FILES SET NAME = ?, FORMAT = ?, FILE_SIZE = ?, STORAGE_ID = ? WHERE ID = ?")) {
             ps.setString(1, file.getName());
-            ps.setLong(2, file.getSize());
-            ps.setLong(3, file.getStorage().getId());
-            ps.setLong(4, file.getId());
+            ps.setString(2, file.getFormat());
+            ps.setLong(3, file.getSize());
+            ps.setLong(4, file.getStorage().getId());
+            ps.setLong(5, file.getId());
             ps.executeUpdate();
 
             return file;
@@ -85,7 +86,7 @@ public class FileDAO extends DaoTools {
             ps.setLong(2, storage.getId());
             if (ps.executeUpdate() == 1) throw new BadRequestException("File already exists");
         } catch (SQLException e) {
-            throw new InternalServerException("An error occurred while trying to check the file " + e.getMessage());
+            throw new InternalServerException("An error occurred while trying to check the file: " + e.getMessage());
         }
     }
 
