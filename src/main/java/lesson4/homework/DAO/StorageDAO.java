@@ -74,7 +74,6 @@ public class StorageDAO extends DaoTools {
             if (!rs.next()) {
                 throw new BadRequestException("Storage with id " + id + " is missing");
             }
-//            String[] filesSupported = rs.getString(2).split(", ");
             return new Storage(
                     rs.getLong(1),
                     rs.getString(2).split(", "),
