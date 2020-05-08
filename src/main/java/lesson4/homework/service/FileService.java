@@ -89,8 +89,9 @@ public class FileService {
         throw new BadRequestException("Unsuitable format");
     }
 
-    private static void checkFilesFormat(Storage storageFrom, Storage storageTo) throws BadRequestException {
-        for (File file : storageFrom.getFiles()) {
+    private static void checkFilesFormat(Storage storageFrom, Storage storageTo)
+            throws BadRequestException, InternalServerException {
+        for (File file : FileDAO.getFilesByStorageId(storageFrom.getId())) {
             if (file != null) checkFileFormat(storageTo, file);
         }
     }
@@ -108,7 +109,7 @@ public class FileService {
 
     private static void checkFiles(Storage storageFrom, Storage storageTo)
             throws BadRequestException, InternalServerException {
-        for (File file : storageFrom.getFiles()) {
+        for (File file : FileDAO.getFilesByStorageId(storageFrom.getId())) {
             FileDAO.checkFileName(storageTo, file);
         }
     }

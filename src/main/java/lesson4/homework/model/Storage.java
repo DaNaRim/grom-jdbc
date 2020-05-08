@@ -3,11 +3,9 @@ package lesson4.homework.model;
 import lesson4.homework.Exceptions.BadRequestException;
 
 import java.util.Arrays;
-import java.util.HashSet;
 
 public class Storage {
     private long id;
-    private HashSet<File> files;
     private String[] formatsSupported;
     private String storageCountry;
     private long storageSize;
@@ -18,16 +16,14 @@ public class Storage {
                 storageCountry.equals("") || storageSize <= 0) {
             throw new BadRequestException("Fields are not filed correctly");
         }
-        this.files = new HashSet<>();
         this.formatsSupported = formatsSupported;
         this.storageCountry = storageCountry;
         this.storageSize = storageSize;
         this.freeSpace = storageSize;
     }
 
-    public Storage(long id, HashSet<File> files, String[] formatsSupported, String storageCountry, long storageSize, long freeSpace) {
+    public Storage(long id, String[] formatsSupported, String storageCountry, long storageSize, long freeSpace) {
         this.id = id;
-        this.files = files;
         this.formatsSupported = formatsSupported;
         this.storageCountry = storageCountry;
         this.storageSize = storageSize;
@@ -36,10 +32,6 @@ public class Storage {
 
     public long getId() {
         return id;
-    }
-
-    public HashSet<File> getFiles() {
-        return files;
     }
 
     public String[] getFormatsSupported() {
@@ -70,7 +62,6 @@ public class Storage {
     public String toString() {
         return "Storage{" +
                 "id=" + id +
-                ", files=" + files +
                 ", formatsSupported=" + Arrays.toString(formatsSupported) +
                 ", storageCountry='" + storageCountry + '\'' +
                 ", storageSize=" + storageSize +

@@ -124,7 +124,7 @@ public class FileDAO extends DaoTools {
             ps.executeUpdate();
 
             file.setId(fileId);
-            file.setStorageId(storage.getId());
+            file.setStorage(storage);
 
             storage.setFreeSpace(storage.getFreeSpace() - file.getSize());
             StorageDAO.update(storage);
@@ -161,7 +161,7 @@ public class FileDAO extends DaoTools {
             conn.setAutoCommit(false);
 
             for (File file : getFilesByStorageId(storageFrom.getId())) {
-                file.setStorageId(storageTo.getId());
+                file.setStorage(storageTo);
                 update(file);
             }
 
@@ -185,7 +185,7 @@ public class FileDAO extends DaoTools {
             conn.setAutoCommit(false);
 
             File file = findById(id);
-            file.setStorageId(storageTo.getId());
+            file.setStorage(storageTo);
             update(file);
 
             storageFrom.setFreeSpace(storageFrom.getFreeSpace() + file.getSize());
