@@ -46,7 +46,7 @@ public class StorageDAO extends DaoTools {
     }
 
     public static Storage update(Storage storage) throws InternalServerException {
-        try (PreparedStatement ps = getConnection().prepareStatement("UPDATE STORAGE SET FORMATS_SUPPORTED = ?, COUNTRY = ?, STORAGE_SIZE = ?, FREESPACE = ? WHERE ID = ?")) {
+        try (PreparedStatement ps = getConnection().prepareStatement("UPDATE STORAGE SET FORMATS_SUPPORTED = ?, COUNTRY = ?, STORAGE_SIZE = ?, FREE_SPACE = ? WHERE ID = ?")) {
 
             StringBuilder formatsSupported = new StringBuilder();
             for (String str : storage.getFormatsSupported()) {
@@ -99,7 +99,7 @@ public class StorageDAO extends DaoTools {
     }
 
     public static void updateFreeSpace(Storage storage, long freeSpace) throws InternalServerException {
-        try (PreparedStatement ps = getConnection().prepareStatement("UPDATE STORAGE SET FREESPACE = ? WHERE ID = ?")) {
+        try (PreparedStatement ps = getConnection().prepareStatement("UPDATE STORAGE SET FREE_SPACE = ? WHERE ID = ?")) {
             ps.setLong(1, freeSpace);
             ps.setLong(2, storage.getId());
             ps.executeUpdate();
