@@ -2,7 +2,6 @@ package lesson4.homework.model;
 
 import lesson4.homework.Exceptions.BadRequestException;
 
-import java.util.Arrays;
 import java.util.HashSet;
 
 public class Storage {
@@ -65,19 +64,7 @@ public class Storage {
         this.files = files;
     }
 
-    public void setFreeSpace(long freeSpace) {
-        this.freeSpace = freeSpace;
-    }
-
-    @Override
-    public String toString() {
-        return "Storage{" +
-                "id=" + id +
-                ", files=" + files +
-                ", formatsSupported=" + Arrays.toString(formatsSupported) +
-                ", storageCountry='" + storageCountry + '\'' +
-                ", storageSize=" + storageSize +
-                ", freeSpace=" + freeSpace +
-                '}';
+    public void setStorageSize(long storageSize) {
+        this.storageSize = storageSize;
     }
 }

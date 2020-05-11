@@ -82,7 +82,7 @@ public class FileService {
         return FileDAO.findById(id);
     }
 
-    private static void checkFileFormat(Storage storage, File file) throws BadRequestException {
+    public static void checkFileFormat(Storage storage, File file) throws BadRequestException {
         for (String str : storage.getFormatsSupported()) {
             if (file.getFormat().equals(str)) return;
         }

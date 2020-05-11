@@ -14,7 +14,7 @@ public class FileDAO extends DaoTools {
     public static File save(Storage storage, File file) throws InternalServerException {
         try (Connection conn = getConnection()) {
             return saveFile(storage, file, conn);
-        } catch (SQLException e) {
+        } catch (SQLException | InternalServerException e) {
             throw new InternalServerException(e.getMessage());
         }
     }
@@ -22,22 +22,15 @@ public class FileDAO extends DaoTools {
     public static void delete(Storage storage, File file) throws InternalServerException {
         try (Connection conn = getConnection()) {
             deleteFile(storage, file, conn);
-        } catch (SQLException e) {
+        } catch (SQLException | InternalServerException e) {
             throw new InternalServerException(e.getMessage());
         }
     }
 
     public static File update(File file) throws InternalServerException {
-        try (PreparedStatement ps = getConnection().prepareStatement("UPDATE FILES SET NAME = ?, FORMAT = ?, FILE_SIZE = ?, STORAGE_ID = ? WHERE ID = ?")) {
-            ps.setString(1, file.getName());
-            ps.setString(2, file.getFormat());
-            ps.setLong(3, file.getSize());
-            ps.setLong(4, file.getStorage().getId());
-            ps.setLong(5, file.getId());
-            ps.executeUpdate();
-
-            return file;
-        } catch (SQLException e) {
+        try (Connection conn = getConnection()) {
+            return update(file, conn);
+        } catch (SQLException | InternalServerException | BadRequestException e) {
             throw new InternalServerException("An error occurred while trying to update the file " + file.getId() +
                     " : " + e.getMessage());
         }
@@ -65,7 +58,7 @@ public class FileDAO extends DaoTools {
     public static void transferAll(Storage storageFrom, Storage storageTo) throws InternalServerException {
         try (Connection conn = getConnection()) {
             transferAllFiles(storageFrom, storageTo, conn);
-        } catch (SQLException e) {
+        } catch (SQLException | InternalServerException e) {
             throw new InternalServerException("An error occurred while trying to transfer files from storage " +
                     storageFrom.getId() + " to storage " + storageTo.getId() + " : " + e.getMessage());
         }
@@ -74,7 +67,7 @@ public class FileDAO extends DaoTools {
     public static void transferFile(Storage storageFrom, Storage storageTo, long id) throws InternalServerException {
         try (Connection conn = getConnection()) {
             transferFile(storageFrom, storageTo, id, conn);
-        } catch (SQLException | BadRequestException e) {
+        } catch (SQLException | BadRequestException | InternalServerException e) {
             throw new InternalServerException("An error occurred while trying to transfer file " + id + " from storage " +
                     storageFrom.getId() + " to storage " + storageTo.getId() + " : " + e.getMessage());
         }
@@ -128,8 +121,7 @@ public class FileDAO extends DaoTools {
             file.setId(fileId);
             file.setStorage(storage);
 
-            storage.setFreeSpace(storage.getFreeSpace() - file.getSize());
-            StorageDAO.update(storage);
+            StorageDAO.updateFreeSpace(storage, storage.getFreeSpace() - file.getSize());
 
             conn.commit();
             return file;
@@ -147,11 +139,40 @@ public class FileDAO extends DaoTools {
             ps.setLong(1, file.getId());
             ps.executeUpdate();
 
-            storage.setFreeSpace(storage.getFreeSpace() + file.getSize());
-            StorageDAO.update(storage);
+            StorageDAO.updateFreeSpace(storage, storage.getFreeSpace() + file.getSize());
 
             conn.commit();
         } catch (SQLException | InternalServerException e) {
+            conn.rollback();
+            throw e;
+        }
+    }
+
+    private static File update(File file, Connection conn)
+            throws InternalServerException, SQLException, BadRequestException {
+        try (PreparedStatement ps = conn.prepareStatement("UPDATE FILES SET NAME = ?, FORMAT = ?, FILE_SIZE = ?, STORAGE_ID = ? WHERE ID = ?")) {
+            conn.setAutoCommit(false);
+
+            ps.setString(1, file.getName());
+            ps.setString(2, file.getFormat());
+            ps.setLong(3, file.getSize());
+            ps.setLong(4, file.getStorage().getId());
+            ps.setLong(5, file.getId());
+            ps.executeUpdate();
+
+            File currentFileVersion = findById(file.getId());
+            Storage currentStorage = currentFileVersion.getStorage();
+
+            if (currentStorage.getId() == file.getStorage().getId()) {
+                StorageDAO.updateFreeSpace(currentStorage, currentStorage.getFreeSpace() + file.getSize() - currentFileVersion.getSize());
+            } else {
+                StorageDAO.updateFreeSpace(currentStorage, currentStorage.getFreeSpace() + currentFileVersion.getSize());
+                StorageDAO.updateFreeSpace(file.getStorage(), file.getStorage().getFreeSpace() - file.getSize());
+            }
+
+            conn.commit();
+            return file;
+        } catch (SQLException | BadRequestException e) {
             conn.rollback();
             throw e;
         }
@@ -167,11 +188,8 @@ public class FileDAO extends DaoTools {
             ps.executeUpdate();
 
             long filesSize = storageFrom.getStorageSize() - storageFrom.getFreeSpace();
-
-            storageFrom.setFreeSpace(storageFrom.getStorageSize());
-            StorageDAO.update(storageFrom);
-            storageTo.setFreeSpace(storageTo.getFreeSpace() - filesSize);
-            StorageDAO.update(storageTo);
+            StorageDAO.updateFreeSpace(storageFrom, storageFrom.getStorageSize());
+            StorageDAO.updateFreeSpace(storageTo, storageTo.getFreeSpace() - filesSize);
 
             conn.commit();
         } catch (SQLException | InternalServerException e) {
@@ -190,11 +208,8 @@ public class FileDAO extends DaoTools {
             ps.executeUpdate();
 
             File file = findById(id);
-
-            storageFrom.setFreeSpace(storageFrom.getFreeSpace() + file.getSize());
-            StorageDAO.update(storageFrom);
-            storageTo.setFreeSpace(storageTo.getFreeSpace() - file.getSize());
-            StorageDAO.update(storageTo);
+            StorageDAO.updateFreeSpace(storageFrom, storageFrom.getFreeSpace() + file.getSize());
+            StorageDAO.updateFreeSpace(storageTo, storageTo.getFreeSpace() - file.getSize());
 
             conn.commit();
         } catch (SQLException | BadRequestException | InternalServerException e) {

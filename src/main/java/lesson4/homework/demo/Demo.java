@@ -7,25 +7,28 @@ import lesson4.homework.model.Storage;
 
 public class Demo {
     public static void main(String[] args) throws Exception {
-//        File file = new File("name3", "jpeg", 539);
-//        Storage storage = new Storage(new String[]{"txt", "jpeg", "mp3"}, "Test", 4555);
+//        Storage storage = new Storage(new String[]{"txt", "jpeg"}, "Test2", 10000);
+//        System.out.println(StorageController.save(storage).getId());
 
-//        Storage storage2 = StorageController.save(storage);
-        Storage storage1 = StorageController.findById(2127443797907688257L);
-        Storage storage3 = StorageController.findById(1);
-//       File file2 = FileController.findById(2137333597638708282L);
+//        Storage storage1 = StorageController.findById(5512760101582555346L);
+//        Storage storage2 = StorageController.findById(5247992291040511811L);
 
-//       file2.setStorage(storage3);
+//        File file = new File("name4", "jpeg", 50);
+//        System.out.println(FileController.put(storage2, file).getId());
+
+//       File file2 = FileController.findById(5987539111710049244L);
+//
+//       file2.setStorage(storage1);
 //       FileController.update(file2);
 //
-//       File file1 = FileController.put(storage1, file);
 //        FileController.delete(storage1, file2);
 
-//        FileController.transferAll(storage3, storage1);
-        FileController.transferFile(storage3, storage1, 2137333597638708282L);
+//        FileController.transferAll(storage2, storage1);
+//        FileController.transferFile(storage1, storage2, 5987539111710049244L);
 
-//
-//        System.out.println(storage1.toString());
-//        System.out.println(file2.toString());
+//        storage1.setStorageSize(storage1.getStorageSize() + 100);
+//        StorageController.update(storage1);
+
+//        StorageController.delete(5512760101582555346L);
     }
 }

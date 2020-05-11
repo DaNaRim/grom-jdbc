@@ -6,7 +6,6 @@ import lesson4.homework.model.File;
 import lesson4.homework.model.Storage;
 
 import java.sql.*;
-import java.util.HashSet;
 import java.util.UUID;
 
 public class StorageDAO extends DaoTools {
@@ -56,10 +55,15 @@ public class StorageDAO extends DaoTools {
             }
             formatsSupported.delete(formatsSupported.lastIndexOf(", "), formatsSupported.length());
 
+            long freeSpace = storage.getStorageSize();
+            for (File file : FileDAO.getFilesByStorage(storage)) {
+                freeSpace -= file.getSize();
+            }
+
             ps.setString(1, formatsSupported.toString());
             ps.setString(2, storage.getStorageCountry());
             ps.setLong(3, storage.getStorageSize());
-            ps.setLong(4, storage.getFreeSpace());
+            ps.setLong(4, freeSpace);
             ps.setLong(5, storage.getId());
             ps.executeUpdate();
 
@@ -74,6 +78,7 @@ public class StorageDAO extends DaoTools {
         try (PreparedStatement ps = getConnection().prepareStatement("SELECT * FROM STORAGE WHERE ID = ?")) {
             ps.setLong(1, id);
             ResultSet rs = ps.executeQuery();
+
             if (!rs.next()) {
                 throw new BadRequestException("Storage with id " + id + " is missing");
             }
@@ -84,12 +89,23 @@ public class StorageDAO extends DaoTools {
                     rs.getString(3),
                     rs.getLong(4),
                     rs.getLong(5));
-            HashSet<File> files = FileDAO.getFilesByStorage(storage);
-            storage.setFiles(files);
+            storage.setFiles(FileDAO.getFilesByStorage(storage));
 
             return storage;
         } catch (SQLException e) {
             throw new InternalServerException("An error occurred while trying to find storage with id " + id + " : " +
+                    e.getMessage());
+        }
+    }
+
+    public static void updateFreeSpace(Storage storage, long freeSpace) throws InternalServerException {
+        try (PreparedStatement ps = getConnection().prepareStatement("UPDATE STORAGE SET FREESPACE = ? WHERE ID = ?")) {
+            ps.setLong(1, freeSpace);
+            ps.setLong(2, storage.getId());
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new InternalServerException("An error occurred while trying to update free space in storage with id " +
+                    storage.getId() + " : " +
                     e.getMessage());
         }
     }
@@ -104,7 +120,7 @@ public class StorageDAO extends DaoTools {
                 FileDAO.delete(storage, file);
             }
 
-            ps.setLong(4, id);
+            ps.setLong(1, id);
             ps.executeUpdate();
 
             conn.commit();

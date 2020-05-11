@@ -54,15 +54,4 @@ public class File {
     public void setStorage(Storage storage) {
         this.storage = storage;
     }
-
-    @Override
-    public String toString() {
-        return "File{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", format='" + format + '\'' +
-                ", size=" + size +
-                ", storage=" + storage.getId() +
-                '}';
-    }
 }
