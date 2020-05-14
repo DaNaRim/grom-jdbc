@@ -15,7 +15,8 @@ public class FileDAO extends DaoTools {
         try (Connection conn = getConnection()) {
             return saveFile(storage, file, conn);
         } catch (SQLException | InternalServerException e) {
-            throw new InternalServerException(e.getMessage());
+            throw new InternalServerException("An error occurred while trying to save the file " + file.getId() +
+                    " in storage " + storage.getId() + " : " + e.getMessage());
         }
     }
 
@@ -23,7 +24,8 @@ public class FileDAO extends DaoTools {
         try (Connection conn = getConnection()) {
             deleteFile(storage, file, conn);
         } catch (SQLException | InternalServerException e) {
-            throw new InternalServerException(e.getMessage());
+            throw new InternalServerException("An error occurred while trying to delete the file " + file.getId() +
+                    " from storage " + storage.getId() + " : " + e.getMessage());
         }
     }
 
