@@ -25,7 +25,7 @@ public class ProductDAO {
 
             tr.commit();
         } catch (HibernateException e) {
-            System.err.println("Save if failed");
+            System.err.println("Save product failed");
             System.err.println(e.getMessage());
         }
     }
@@ -40,7 +40,7 @@ public class ProductDAO {
 
             tr.commit();
         } catch (HibernateException e) {
-            System.err.println("Delete if failed");
+            System.err.println("Delete product failed");
             System.err.println(e.getMessage());
         }
     }
@@ -55,7 +55,7 @@ public class ProductDAO {
 
             tr.commit();
         } catch (HibernateException e) {
-            System.err.println("Update if failed");
+            System.err.println("Update product failed");
             System.err.println(e.getMessage());
         }
     }
@@ -73,11 +73,11 @@ public class ProductDAO {
             }
             tr.commit();
         } catch (HibernateException e) {
-            System.err.println("SaveProducts if failed");
+            System.err.println("SaveProducts failed");
             System.err.println(e.getMessage());
 
             if (tr != null) tr.rollback();
-        }  finally {
+        } finally {
             if (session != null) session.close();
         }
     }
@@ -95,7 +95,7 @@ public class ProductDAO {
             }
             tr.commit();
         } catch (HibernateException e) {
-            System.err.println("DeleteProducts if failed");
+            System.err.println("DeleteProducts failed");
             System.err.println(e.getMessage());
 
             if (tr != null) tr.rollback();
@@ -117,11 +117,11 @@ public class ProductDAO {
             }
             tr.commit();
         } catch (HibernateException e) {
-            System.err.println("UpdateProducts if failed");
+            System.err.println("UpdateProducts failed");
             System.err.println(e.getMessage());
 
             if (tr != null) tr.rollback();
-        }  finally {
+        } finally {
             if (session != null) session.close();
         }
     }
