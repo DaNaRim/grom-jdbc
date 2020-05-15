@@ -10,7 +10,8 @@
         </property>
         <property name="hibernate.connection.username">main</property>
         <property name="hibernate.connection.password">PyP2p02rIZ9uyMBpTBwW</property>
-<!--        <mapping class="hibernate.lesson1.Product"/>-->
-        <mapping class="hibernate.lesson2.Product"/>
+        <!--        <mapping class="hibernate.lesson1.Product"/>-->
+        <!--        <mapping class="hibernate.lesson2.Product"/>-->
+        <mapping class="hibernate.lesson2.homework1.Product"/>
     </session-factory>
 </hibernate-configuration>
