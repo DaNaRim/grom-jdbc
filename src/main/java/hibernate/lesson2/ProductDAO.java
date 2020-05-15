@@ -16,10 +16,8 @@ public class ProductDAO {
         //action
         //close session/tr
 
-        Session session = null;
-        Transaction tr = null;
-        try {
-            session = createSessionFactory().openSession();
+        Transaction tr;
+        try (Session session = createSessionFactory().openSession()) {
             tr = session.getTransaction();
             tr.begin();
 
@@ -29,39 +27,27 @@ public class ProductDAO {
         } catch (HibernateException e) {
             System.err.println("Save if failed");
             System.err.println(e.getMessage());
-
-            if (tr != null) tr.rollback();
-        }  finally {
-            if (session != null) session.close();
         }
     }
 
     public static void delete(Product product) {
-        Session session = null;
-            Transaction tr = null;
-            try {
-                session = createSessionFactory().openSession();
-                tr = session.getTransaction();
-                tr.begin();
+        Transaction tr;
+        try (Session session = createSessionFactory().openSession()) {
+            tr = session.getTransaction();
+            tr.begin();
 
-                session.delete(product);
+            session.delete(product);
 
-                tr.commit();
-            } catch (HibernateException e) {
-                System.err.println("Delete if failed");
-                System.err.println(e.getMessage());
-
-                if (tr != null) tr.rollback();
-            }  finally {
-                if (session != null) session.close();
-            }
+            tr.commit();
+        } catch (HibernateException e) {
+            System.err.println("Delete if failed");
+            System.err.println(e.getMessage());
+        }
     }
 
     public static void update(Product product) {
-        Session session = null;
-        Transaction tr = null;
-        try {
-            session = createSessionFactory().openSession();
+        Transaction tr;
+        try (Session session = createSessionFactory().openSession()) {
             tr = session.getTransaction();
             tr.begin();
 
@@ -71,10 +57,6 @@ public class ProductDAO {
         } catch (HibernateException e) {
             System.err.println("Update if failed");
             System.err.println(e.getMessage());
-
-            if (tr != null) tr.rollback();
-        }  finally {
-            if (session != null) session.close();
         }
     }
 
