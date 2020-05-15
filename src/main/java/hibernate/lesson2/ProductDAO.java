@@ -73,7 +73,7 @@ public class ProductDAO {
             }
             tr.commit();
         } catch (HibernateException e) {
-            System.err.println("SaveProducts failed");
+            System.err.println("Save products failed");
             System.err.println(e.getMessage());
 
             if (tr != null) tr.rollback();
@@ -95,7 +95,7 @@ public class ProductDAO {
             }
             tr.commit();
         } catch (HibernateException e) {
-            System.err.println("DeleteProducts failed");
+            System.err.println("Delete products failed");
             System.err.println(e.getMessage());
 
             if (tr != null) tr.rollback();
@@ -117,7 +117,7 @@ public class ProductDAO {
             }
             tr.commit();
         } catch (HibernateException e) {
-            System.err.println("UpdateProducts failed");
+            System.err.println("Update products failed");
             System.err.println(e.getMessage());
 
             if (tr != null) tr.rollback();
