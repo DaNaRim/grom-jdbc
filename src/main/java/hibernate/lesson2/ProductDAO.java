@@ -61,10 +61,8 @@ public class ProductDAO {
     }
 
     public static void saveProducts(List<Product> products) {
-        Session session = null;
-        Transaction tr = null;
-        try {
-            session = createSessionFactory().openSession();
+        Transaction tr;
+        try (Session session = createSessionFactory().openSession()) {
             tr = session.getTransaction();
             tr.begin();
 
@@ -75,18 +73,12 @@ public class ProductDAO {
         } catch (HibernateException e) {
             System.err.println("Save products failed");
             System.err.println(e.getMessage());
-
-            if (tr != null) tr.rollback();
-        } finally {
-            if (session != null) session.close();
         }
     }
 
     public static void deleteProducts(List<Product> products) {
-        Session session = null;
-        Transaction tr = null;
-        try {
-            session = createSessionFactory().openSession();
+        Transaction tr;
+        try (Session session = createSessionFactory().openSession()) {
             tr = session.getTransaction();
             tr.begin();
 
@@ -97,18 +89,12 @@ public class ProductDAO {
         } catch (HibernateException e) {
             System.err.println("Delete products failed");
             System.err.println(e.getMessage());
-
-            if (tr != null) tr.rollback();
-        }  finally {
-            if (session != null) session.close();
         }
     }
 
     public static void updateProducts(List<Product> products) {
-        Session session = null;
-        Transaction tr = null;
-        try {
-            session = createSessionFactory().openSession();
+        Transaction tr;
+        try (Session session = createSessionFactory().openSession()) {
             tr = session.getTransaction();
             tr.begin();
 
@@ -119,10 +105,6 @@ public class ProductDAO {
         } catch (HibernateException e) {
             System.err.println("Update products failed");
             System.err.println(e.getMessage());
-
-            if (tr != null) tr.rollback();
-        } finally {
-            if (session != null) session.close();
         }
     }
 
