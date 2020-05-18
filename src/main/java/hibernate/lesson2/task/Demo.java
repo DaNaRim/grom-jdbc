@@ -1,4 +1,4 @@
-package hibernate.lesson2.classwork;
+package hibernate.lesson2.task;
 
 import java.util.Arrays;
 import java.util.List;
