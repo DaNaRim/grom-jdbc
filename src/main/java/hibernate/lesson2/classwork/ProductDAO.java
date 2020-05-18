@@ -1,4 +1,4 @@
-package hibernate.lesson2;
+package hibernate.lesson2.classwork;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
