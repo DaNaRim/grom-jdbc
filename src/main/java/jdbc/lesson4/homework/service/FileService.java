@@ -153,9 +153,10 @@ public class FileService {
 
         List<String> storageFormats = Arrays.asList(storage.getFormatsSupported());
 
-        if (!storageFormats.contains(formats)) {
-
-            throw new BadRequestException("Unsuitable format");
+        for (String format : formats) {
+            if (!storageFormats.contains(format)) {
+                throw new BadRequestException("Unsuitable format");
+            }
         }
     }
 

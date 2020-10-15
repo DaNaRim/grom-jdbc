@@ -5,6 +5,7 @@ import jdbc.lesson4.homework.exceptions.InternalServerException;
 import jdbc.lesson4.homework.model.File;
 import jdbc.lesson4.homework.model.Storage;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -24,7 +25,7 @@ public class FileDAO {
     private static final String DELETE_QUERY = "DELETE FROM FILES WHERE ID = ?";
 
     private static final String PUT_QUERY = "UPDATE FILES SET STORAGE_ID = ? WHERE ID = ?";
-    private static final String DELETE_FROM_STORAGE_QUERY = "UPDATE FILES SET STORAGE_ID = 0 WHERE ID = ?";
+    private static final String DELETE_FROM_STORAGE_QUERY = "UPDATE FILES SET STORAGE_ID = NULL WHERE ID = ?";
     private static final String TRANSFER_ALL_QUERY = "UPDATE FILES SET STORAGE_ID = ? WHERE STORAGE_ID = ?";
 
     private static final String DELETE_FILES_BY_STORAGE_QUERY = "DELETE FROM FILES WHERE STORAGE_ID = ?";
@@ -44,7 +45,7 @@ public class FileDAO {
             ps.setString(2, file.getName());
             ps.setString(3, file.getFormat());
             ps.setLong(4, file.getSize());
-            ps.setLong(5, 0);
+            ps.setObject(5, null);
             ps.executeUpdate();
 
             return file;
@@ -65,13 +66,13 @@ public class FileDAO {
                 throw new BadRequestException("missing file with id: " + id);
             }
 
-            long storageId = rs.getLong(5);
+            BigDecimal bd = (BigDecimal) rs.getObject(5);
             return new File(
                     rs.getLong(1),
                     rs.getString(2),
                     rs.getString(3),
                     rs.getLong(4),
-                    storageId == 0 ? null : storageDAO.findById(storageId));
+                    bd == null ? null : storageDAO.findById(bd.longValue()));
 
         } catch (SQLException e) {
             throw new InternalServerException("An error occurred while trying to find file with id " + id + " : "
@@ -88,7 +89,7 @@ public class FileDAO {
             ps.setString(1, file.getName());
             ps.setString(2, file.getFormat());
             ps.setLong(3, file.getSize());
-            ps.setLong(4, fileStorage == null ? 0 : fileStorage.getId());
+            ps.setObject(4, fileStorage == null ? null : fileStorage.getId());
             ps.setLong(5, file.getId());
             ps.executeUpdate();
 
@@ -219,6 +220,7 @@ public class FileDAO {
             ps.setLong(1, storageId);
             ResultSet rs = ps.executeQuery();
 
+            rs.next();
             if (rs.getLong(1) == 0) {
                 throw new BadRequestException("Storage is Empty");
             }
@@ -236,6 +238,7 @@ public class FileDAO {
             ps.setLong(1, storageId);
             ResultSet rs = ps.executeQuery();
 
+            rs.next();
             return rs.getLong(1);
 
         } catch (SQLException e) {
@@ -244,7 +247,7 @@ public class FileDAO {
         }
     }
 
-    public void checkFormat(String[] formatSupported) throws BadRequestException, InternalServerException {
+    public void checkFormat(String[] formatsSupported) throws BadRequestException, InternalServerException {
 
         try (PreparedStatement ps = DaoTools.getConnection().prepareStatement(CHECK_FORMAT_QUERY)) {
 
@@ -255,8 +258,10 @@ public class FileDAO {
                 formats.add(rs.getString(1));
             }
 
-            if (!formats.contains(Arrays.asList(formatSupported))) {
-                throw new BadRequestException("Files from this storage have a format that is no longer available");
+            for (String format : formats) {
+                if (!Arrays.asList(formatsSupported).contains(format)) {
+                    throw new BadRequestException("Files from this storage have a format that is no longer available");
+                }
             }
 
         } catch (SQLException e) {
