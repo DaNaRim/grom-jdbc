@@ -37,7 +37,7 @@ public class FileDAO {
 
     public File save(File file) throws InternalServerException {
 
-        try (PreparedStatement ps = DaoTools.getConnection().prepareStatement(SAVE_QUERY)) {
+        try (PreparedStatement ps = DAOTools.getConnection().prepareStatement(SAVE_QUERY)) {
 
             file.setId(UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE);
 
@@ -57,7 +57,7 @@ public class FileDAO {
 
     public File findById(long id) throws BadRequestException, InternalServerException {
 
-        try (PreparedStatement ps = DaoTools.getConnection().prepareStatement(FIND_BY_ID_QUERY)) {
+        try (PreparedStatement ps = DAOTools.getConnection().prepareStatement(FIND_BY_ID_QUERY)) {
 
             ps.setLong(1, id);
             ResultSet rs = ps.executeQuery();
@@ -82,7 +82,7 @@ public class FileDAO {
 
     public File update(File file) throws InternalServerException {
 
-        try (PreparedStatement ps = DaoTools.getConnection().prepareStatement(UPDATE_QUERY)) {
+        try (PreparedStatement ps = DAOTools.getConnection().prepareStatement(UPDATE_QUERY)) {
 
             Storage fileStorage = file.getStorage();
 
@@ -102,7 +102,7 @@ public class FileDAO {
 
     public void delete(long id) throws InternalServerException {
 
-        try (PreparedStatement ps = DaoTools.getConnection().prepareStatement(DELETE_QUERY)) {
+        try (PreparedStatement ps = DAOTools.getConnection().prepareStatement(DELETE_QUERY)) {
 
             ps.setLong(1, id);
             ps.executeUpdate();
@@ -115,7 +115,7 @@ public class FileDAO {
 
     public File put(Storage storage, File file) throws InternalServerException {
 
-        try (PreparedStatement ps = DaoTools.getConnection().prepareStatement(PUT_QUERY)) {
+        try (PreparedStatement ps = DAOTools.getConnection().prepareStatement(PUT_QUERY)) {
 
             file.setStorage(storage);
 
@@ -132,7 +132,7 @@ public class FileDAO {
 
     public void putAll(Storage storage, List<File> files) throws InternalServerException {
 
-        try (Connection conn = DaoTools.getConnection()) {
+        try (Connection conn = DAOTools.getConnection()) {
 
             putAll(storage, files, conn);
 
@@ -144,7 +144,7 @@ public class FileDAO {
 
     public File deleteFromStorage(long StorageId, File file) throws InternalServerException {
 
-        try (PreparedStatement ps = DaoTools.getConnection().prepareStatement(DELETE_FROM_STORAGE_QUERY)) {
+        try (PreparedStatement ps = DAOTools.getConnection().prepareStatement(DELETE_FROM_STORAGE_QUERY)) {
 
             file.setStorage(null);
 
@@ -160,7 +160,7 @@ public class FileDAO {
 
     public void transferAll(long storageFromId, long storageToId) throws InternalServerException {
 
-        try (PreparedStatement ps = DaoTools.getConnection().prepareStatement(TRANSFER_ALL_QUERY)) {
+        try (PreparedStatement ps = DAOTools.getConnection().prepareStatement(TRANSFER_ALL_QUERY)) {
 
             ps.setLong(1, storageToId);
             ps.setLong(2, storageFromId);
@@ -174,7 +174,7 @@ public class FileDAO {
 
     public void transferFile(long storageFromId, long storageToId, long id) throws InternalServerException {
 
-        try (PreparedStatement ps = DaoTools.getConnection().prepareStatement(PUT_QUERY)) {
+        try (PreparedStatement ps = DAOTools.getConnection().prepareStatement(PUT_QUERY)) {
 
             ps.setLong(1, storageToId);
             ps.setLong(2, id);
@@ -187,7 +187,7 @@ public class FileDAO {
     }
 
     public void deleteFilesByStorage(long storageId) throws InternalServerException {
-        try (PreparedStatement ps = DaoTools.getConnection().prepareStatement(DELETE_FILES_BY_STORAGE_QUERY)) {
+        try (PreparedStatement ps = DAOTools.getConnection().prepareStatement(DELETE_FILES_BY_STORAGE_QUERY)) {
 
             ps.setLong(1, storageId);
             ps.executeUpdate();
@@ -200,7 +200,7 @@ public class FileDAO {
 
     public void checkFileName(String name) throws BadRequestException, InternalServerException {
 
-        try (PreparedStatement ps = DaoTools.getConnection().prepareStatement(CHECK_FILE_NAME_QUERY)) {
+        try (PreparedStatement ps = DAOTools.getConnection().prepareStatement(CHECK_FILE_NAME_QUERY)) {
 
             ps.setString(1, name);
 
@@ -215,7 +215,7 @@ public class FileDAO {
     }
 
     public void checkStorageIsEmpty(long storageId) throws BadRequestException, InternalServerException {
-        try (PreparedStatement ps = DaoTools.getConnection().prepareStatement(CHECK_STORAGE_FOR_EMPTY_QUERY)) {
+        try (PreparedStatement ps = DAOTools.getConnection().prepareStatement(CHECK_STORAGE_FOR_EMPTY_QUERY)) {
 
             ps.setLong(1, storageId);
             ResultSet rs = ps.executeQuery();
@@ -233,7 +233,7 @@ public class FileDAO {
 
     public long getFilesSizeByStorageId(long storageId) throws InternalServerException {
 
-        try (PreparedStatement ps = DaoTools.getConnection().prepareStatement(GET_FILES_SIZE_BY_STORAGE_QUERY)) {
+        try (PreparedStatement ps = DAOTools.getConnection().prepareStatement(GET_FILES_SIZE_BY_STORAGE_QUERY)) {
 
             ps.setLong(1, storageId);
             ResultSet rs = ps.executeQuery();
@@ -249,7 +249,7 @@ public class FileDAO {
 
     public void checkFormat(String[] formatsSupported) throws BadRequestException, InternalServerException {
 
-        try (PreparedStatement ps = DaoTools.getConnection().prepareStatement(CHECK_FORMAT_QUERY)) {
+        try (PreparedStatement ps = DAOTools.getConnection().prepareStatement(CHECK_FORMAT_QUERY)) {
 
             ResultSet rs = ps.executeQuery();
 

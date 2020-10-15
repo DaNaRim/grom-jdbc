@@ -21,7 +21,7 @@ public class StorageDAO {
 
     public Storage save(Storage storage) throws InternalServerException {
 
-        try (PreparedStatement ps = DaoTools.getConnection().prepareStatement(SAVE_QUERY)) {
+        try (PreparedStatement ps = DAOTools.getConnection().prepareStatement(SAVE_QUERY)) {
 
             storage.setId(UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE);
 
@@ -46,7 +46,7 @@ public class StorageDAO {
 
     public Storage findById(long id) throws BadRequestException, InternalServerException {
 
-        try (PreparedStatement ps = DaoTools.getConnection().prepareStatement(FIND_BY_ID_QUERY)) {
+        try (PreparedStatement ps = DAOTools.getConnection().prepareStatement(FIND_BY_ID_QUERY)) {
 
             ps.setLong(1, id);
             ResultSet rs = ps.executeQuery();
@@ -69,7 +69,7 @@ public class StorageDAO {
 
     public Storage update(Storage storage) throws InternalServerException {
 
-        try (PreparedStatement ps = DaoTools.getConnection().prepareStatement(UPDATE_QUERY)) {
+        try (PreparedStatement ps = DAOTools.getConnection().prepareStatement(UPDATE_QUERY)) {
 
             StringBuilder formatsSupported = new StringBuilder();
             for (String str : storage.getFormatsSupported()) {
@@ -93,7 +93,7 @@ public class StorageDAO {
 
     public void delete(long id) throws InternalServerException {
 
-        try (Connection conn = DaoTools.getConnection()) {
+        try (Connection conn = DAOTools.getConnection()) {
 
             delete(id, conn);
 
