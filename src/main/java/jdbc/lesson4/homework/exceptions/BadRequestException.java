@@ -1,4 +1,4 @@
-package jdbc.lesson4.homework.Exceptions;
+package jdbc.lesson4.homework.exceptions;
 
 public class BadRequestException extends Exception {
 

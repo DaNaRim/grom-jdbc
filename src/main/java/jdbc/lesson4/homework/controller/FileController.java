@@ -1,7 +1,7 @@
 package jdbc.lesson4.homework.controller;
 
-import jdbc.lesson4.homework.Exceptions.BadRequestException;
-import jdbc.lesson4.homework.Exceptions.InternalServerException;
+import jdbc.lesson4.homework.exceptions.BadRequestException;
+import jdbc.lesson4.homework.exceptions.InternalServerException;
 import jdbc.lesson4.homework.model.File;
 import jdbc.lesson4.homework.service.FileService;
 import jdbc.lesson4.homework.model.Storage;
