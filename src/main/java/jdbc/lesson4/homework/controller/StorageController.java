@@ -7,19 +7,62 @@ import jdbc.lesson4.homework.service.StorageService;
 
 public class StorageController {
 
-    public static Storage save(Storage storage) throws InternalServerException {
-        return StorageService.save(storage);
+    private static final StorageService storageService = new StorageService();
+
+    public String save(Storage storage) {
+        try {
+            storageService.save(storage);
+
+            return "save success";
+        } catch (InternalServerException e) {
+
+            System.err.println(e.getMessage());
+            return "save failed: something went wrong";
+        }
     }
 
-    public static void delete(long id) throws BadRequestException, InternalServerException {
-        StorageService.delete(id);
+    public String findById(long id) {
+        try {
+            storageService.findById(id);
+
+            return "findById success";
+        } catch (BadRequestException e) {
+
+            return "findById failed: " + e.getMessage();
+        } catch (InternalServerException e) {
+
+            System.err.println(e.getMessage());
+            return "findById failed: something went wrong";
+        }
     }
 
-    public static Storage update(Storage storage) throws InternalServerException, BadRequestException {
-        return StorageService.update(storage);
+    public String update(Storage storage) {
+        try {
+            storageService.update(storage);
+
+            return "update success";
+        } catch (BadRequestException e) {
+
+            return "update failed: " + e.getMessage();
+        } catch (InternalServerException e) {
+
+            System.err.println(e.getMessage());
+            return "update failed: something went wrong";
+        }
     }
 
-    public static Storage findById(long id) throws BadRequestException, InternalServerException {
-        return StorageService.findById(id);
+    public String delete(long id) {
+        try {
+            storageService.delete(id);
+
+            return "delete success";
+        } catch (BadRequestException e) {
+
+            return "delete failed: " + e.getMessage();
+        } catch (InternalServerException e) {
+
+            System.err.println(e.getMessage());
+            return "delete failed: something went wrong";
+        }
     }
 }
