@@ -115,7 +115,7 @@ public class FileService {
             throws BadRequestException, InternalServerException {
 
         if (file.getStorage() != null) {
-            if (file.getStorage().getId() == storage.getId()) {
+            if (file.getStorage().getId().equals(storage.getId())) {
                 throw new BadRequestException("The file is already in current storage");
             }
             throw new BadRequestException("The file is in another storage");
@@ -128,12 +128,12 @@ public class FileService {
             throws BadRequestException, InternalServerException {
 
         long filesSize = 0;
-        List<String> formats = new ArrayList();
+        List<String> formats = new ArrayList<>();
 
         for (File file : files) {
 
             if (file.getStorage() != null) {
-                if (file.getStorage().getId() == storage.getId()) {
+                if (file.getStorage().getId().equals(storage.getId())) {
                     throw new BadRequestException("The file is already in current storage");
                 }
                 throw new BadRequestException("The file is in another storage");
@@ -151,7 +151,7 @@ public class FileService {
         if (freeSpace < filesSize) throw new BadRequestException("No storage space");
 
 
-        List storageFormats = Arrays.asList(storage.getFormatsSupported());
+        List<String> storageFormats = Arrays.asList(storage.getFormatsSupported());
 
         if (!storageFormats.contains(formats)) {
 
@@ -219,7 +219,7 @@ public class FileService {
         if (storageFromId != file.getStorage().getId()) {
             throw new BadRequestException("The file is not in the given storage");
         }
-        if (file.getStorage().getId() == storageTo.getId()) {
+        if (file.getStorage().getId().equals(storageTo.getId())) {
             throw new BadRequestException("The file is already in current storage");
         }
 

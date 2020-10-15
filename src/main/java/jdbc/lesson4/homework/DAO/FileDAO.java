@@ -26,6 +26,7 @@ public class FileDAO {
     private static final String PUT_QUERY = "UPDATE FILES SET STORAGE_ID = ? WHERE ID = ?";
     private static final String DELETE_FROM_STORAGE_QUERY = "UPDATE FILES SET STORAGE_ID = 0 WHERE ID = ?";
     private static final String TRANSFER_ALL_QUERY = "UPDATE FILES SET STORAGE_ID = ? WHERE STORAGE_ID = ?";
+
     private static final String DELETE_FILES_BY_STORAGE_QUERY = "DELETE FROM FILES WHERE STORAGE_ID = ?";
 
     private static final String CHECK_FILE_NAME_QUERY = "SELECT * FROM FILES WHERE NAME = ?";
@@ -249,7 +250,7 @@ public class FileDAO {
 
             ResultSet rs = ps.executeQuery();
 
-            List<String> formats = new ArrayList();
+            List<String> formats = new ArrayList<>();
             while (rs.next()) {
                 formats.add(rs.getString(1));
             }
