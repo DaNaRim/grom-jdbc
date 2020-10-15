@@ -57,11 +57,14 @@ public class FileController {
         }
     }
 
-    public String delete(File file) {
+    public String delete(long id) {
         try {
-            fileService.delete(file.getId());
+            fileService.delete(id);
 
             return "delete success";
+        } catch (BadRequestException e) {
+
+            return "delete failed: " + e.getMessage();
         } catch (InternalServerException e) {
 
             System.err.println(e.getMessage());
@@ -143,5 +146,4 @@ public class FileController {
             return "transferFile failed: something went wrong";
         }
     }
-
 }

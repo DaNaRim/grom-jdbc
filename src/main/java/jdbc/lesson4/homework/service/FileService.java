@@ -38,8 +38,14 @@ public class FileService {
         }
     }
 
-    public void delete(long id) throws InternalServerException {
-        fileDAO.delete(id);
+    public void delete(long id) throws InternalServerException, BadRequestException {
+        try {
+            findById(id);
+
+            fileDAO.delete(id);
+        } catch (BadRequestException e) {
+            throw new BadRequestException("Cannot delete file " + id + " : " + e.getMessage());
+        }
     }
 
     public File put(Storage storage, File file) throws BadRequestException, InternalServerException {
