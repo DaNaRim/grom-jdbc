@@ -9,60 +9,19 @@ public class StorageController {
 
     private static final StorageService storageService = new StorageService();
 
-    public String save(Storage storage) {
-        try {
-            storageService.save(storage);
-
-            return "save success";
-        } catch (InternalServerException e) {
-
-            System.err.println(e.getMessage());
-            return "save failed: something went wrong";
-        }
+    public Storage save(Storage storage) throws InternalServerException {
+        return storageService.save(storage);
     }
 
-    public String findById(long id) {
-        try {
-            storageService.findById(id);
-
-            return "findById success";
-        } catch (BadRequestException e) {
-
-            return "findById failed: " + e.getMessage();
-        } catch (InternalServerException e) {
-
-            System.err.println(e.getMessage());
-            return "findById failed: something went wrong";
-        }
+    public Storage findById(long id) throws BadRequestException, InternalServerException {
+        return storageService.findById(id);
     }
 
-    public String update(Storage storage) {
-        try {
-            storageService.update(storage);
-
-            return "update success";
-        } catch (BadRequestException e) {
-
-            return "update failed: " + e.getMessage();
-        } catch (InternalServerException e) {
-
-            System.err.println(e.getMessage());
-            return "update failed: something went wrong";
-        }
+    public Storage update(Storage storage) throws BadRequestException, InternalServerException {
+        return storageService.update(storage);
     }
 
-    public String delete(long id) {
-        try {
-            storageService.delete(id);
-
-            return "delete success";
-        } catch (BadRequestException e) {
-
-            return "delete failed: " + e.getMessage();
-        } catch (InternalServerException e) {
-
-            System.err.println(e.getMessage());
-            return "delete failed: something went wrong";
-        }
+    public void delete(long id) throws BadRequestException, InternalServerException {
+        storageService.delete(id);
     }
 }
