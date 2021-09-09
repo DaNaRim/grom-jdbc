@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>jdbc-hibernate-grom</groupId>
-    <artifactId>jdbc-hibernate-grom</artifactId>
+    <groupId>grom-jdbc</groupId>
+    <artifactId>grom-jdbc</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
@@ -16,15 +16,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.oracle</groupId>
-            <artifactId>ojdbc7</artifactId>
-            <version>12.1.0.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <version>5.4.9.Final</version>
+            <groupId>com.oracle.database.jdbc</groupId>
+            <artifactId>ojdbc8</artifactId>
+            <version>21.3.0.0</version>
         </dependency>
 
     </dependencies>
