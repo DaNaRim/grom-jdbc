@@ -18,7 +18,8 @@ public class TransactionDemo {
     //1. save order - pay money - receive money + ...b
     //2. save order - pay money - receive money
 
-    private static final String DB_URL = "jdbc:oracle:thin:@gromcode-lessons.c2nwr4ze1uqa.us-east-2.rds.amazonaws.com:1521:ORCL";
+    private static final String DB_URL =
+            "jdbc:oracle:thin:@gromcode-lessons.c2nwr4ze1uqa.us-east-2.rds.amazonaws.com:1521:ORCL";
     private static final String USER = "main";
     private static final String PASS = "PyP2p02rIZ9uyMBpTBwW";
 
@@ -33,7 +34,8 @@ public class TransactionDemo {
 
     private static void saveList(List<Product> products, Connection conn) throws SQLException {
         long productID = products.get(0).getId();
-        try (PreparedStatement ps = conn.prepareStatement("INSERT INTO PRODUCT VALUES(?, ?, ?, ?)")) {
+
+        try (PreparedStatement ps = conn.prepareStatement("INSERT INTO product VALUES(?, ?, ?, ?)")) {
             conn.setAutoCommit(false);
 
             for (Product product : products) {

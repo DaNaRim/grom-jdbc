@@ -1,6 +1,7 @@
 package lesson3.homework1;
 
 public class Product {
+
     private long id;
     private String name;
     private String description;

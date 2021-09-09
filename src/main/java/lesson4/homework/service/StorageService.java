@@ -51,5 +51,4 @@ public class StorageService {
 
         fileDAO.checkFormat(storage.getFormatsSupported());
     }
-
 }

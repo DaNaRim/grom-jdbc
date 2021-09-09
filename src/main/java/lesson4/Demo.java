@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Demo {
+
     public static void main(String[] args) {
         Product product1 = new Product(4, "!!!", "!!!!", 7777);
         Product product2 = new Product(5, "!!!", "!!!!", 7777);

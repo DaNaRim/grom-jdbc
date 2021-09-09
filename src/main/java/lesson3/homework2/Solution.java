@@ -4,14 +4,19 @@ import java.sql.*;
 import java.util.Date;
 
 public class Solution {
-    private static final String DB_URL = "jdbc:oracle:thin:@gromcode-lessons.c2nwr4ze1uqa.us-east-2.rds.amazonaws.com:1521:ORCL";
+
+    private static final String DB_URL =
+            "jdbc:oracle:thin:@gromcode-lessons.c2nwr4ze1uqa.us-east-2.rds.amazonaws.com:1521:ORCL";
     private static final String USER = "main";
     private static final String PASS = "PyP2p02rIZ9uyMBpTBwW";
 
     //141684
     public long testSavePerformance() {
         long start = new Date().getTime();
-        try (PreparedStatement ps = getConnection().prepareStatement("INSERT INTO PRODUCT VALUES (?, 'TEST', 'TEST', 100)")) {
+
+        String query = "INSERT INTO product VALUES (?, 'TEST', 'TEST', 100)";
+
+        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             for (int i = 0; i < 1000; i++) {
                 ps.setLong(1, i);
                 ps.executeUpdate();
@@ -25,7 +30,8 @@ public class Solution {
     //138189
     public long testDeleteByIdPerformance() {
         long start = new Date().getTime();
-        try (PreparedStatement ps = getConnection().prepareStatement("DELETE FROM PRODUCT WHERE ID = ?")) {
+
+        try (PreparedStatement ps = getConnection().prepareStatement("DELETE FROM product WHERE ID = ?")) {
             for (int i = 0; i < 1000; i++) {
                 ps.setLong(1, i);
                 ps.executeUpdate();
@@ -39,8 +45,9 @@ public class Solution {
     //1437
     public long testDeletePerformance() {
         long start = new Date().getTime();
+
         try (Statement st = getConnection().createStatement()) {
-            st.executeUpdate("DELETE FROM PRODUCT");
+            st.executeUpdate("DELETE FROM product");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -50,7 +57,7 @@ public class Solution {
     //135622
     public long testSelectByIdPerformance() {
         long start = new Date().getTime();
-        try (PreparedStatement ps = getConnection().prepareStatement("SELECT * FROM PRODUCT WHERE ID = ?")) {
+        try (PreparedStatement ps = getConnection().prepareStatement("SELECT * FROM product WHERE id = ?")) {
             for (int i = 0; i < 1000; i++) {
                 ps.setLong(1, i);
                 ps.executeUpdate();
@@ -64,8 +71,9 @@ public class Solution {
     //1484
     public long testSelectPerformance() {
         long start = new Date().getTime();
+
         try (Statement st = getConnection().createStatement()) {
-            st.executeUpdate("SELECT * FROM PRODUCT");
+            st.executeUpdate("SELECT * FROM product");
         } catch (SQLException e) {
             e.printStackTrace();
         }

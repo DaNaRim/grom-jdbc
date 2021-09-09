@@ -105,9 +105,12 @@ public class FileService {
     }
 
     private void validateSave(String fileName, long fileSize) throws BadRequestException, InternalServerException {
-        if (fileName.length() > 10) throw new BadRequestException("File name length must be <= 10");
-        if (fileSize <= 0) throw new BadRequestException("File size must be > 0");
-
+        if (fileName.length() > 10) {
+            throw new BadRequestException("File name length must be <= 10");
+        }
+        if (fileSize <= 0) {
+            throw new BadRequestException("File size must be > 0");
+        }
         fileDAO.checkFileName(fileName);
     }
 
@@ -148,8 +151,9 @@ public class FileService {
 
         long freeSpace = storage.getStorageSize() - fileDAO.getFilesSizeByStorageId(storage.getId());
 
-        if (freeSpace < filesSize) throw new BadRequestException("No storage space");
-
+        if (freeSpace < filesSize) {
+            throw new BadRequestException("No storage space");
+        }
 
         List<String> storageFormats = Arrays.asList(storage.getFormatsSupported());
 
@@ -172,8 +176,12 @@ public class FileService {
 
     private void validateUpdate(File file) throws BadRequestException, InternalServerException {
 
-        if (file.getName().length() > 10) throw new BadRequestException("File name length must be <= 10");
-        if (file.getSize() <= 0) throw new BadRequestException("File size must be > 0");
+        if (file.getName().length() > 10) {
+            throw new BadRequestException("File name length must be <= 10");
+        }
+        if (file.getSize() <= 0) {
+            throw new BadRequestException("File size must be > 0");
+        }
 
         String oldName = findById(file.getId()).getName();
 
@@ -208,7 +216,9 @@ public class FileService {
         long filesSizeFrom = fileDAO.getFilesSizeByStorageId(storageFromId);
         long freeSpaceTo = storageTo.getStorageSize() - fileDAO.getFilesSizeByStorageId(storageTo.getId());
 
-        if (filesSizeFrom > freeSpaceTo) throw new BadRequestException("No storage space");
+        if (filesSizeFrom > freeSpaceTo) {
+            throw new BadRequestException("No storage space");
+        }
     }
 
     private void validateTransferFile(long storageFromId, Storage storageTo, File file)
@@ -238,6 +248,8 @@ public class FileService {
 
         long freeSpace = storage.getStorageSize() - fileDAO.getFilesSizeByStorageId(storage.getId());
 
-        if (freeSpace < fileSize) throw new BadRequestException("No storage space");
+        if (freeSpace < fileSize) {
+            throw new BadRequestException("No storage space");
+        }
     }
 }

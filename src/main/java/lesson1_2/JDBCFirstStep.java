@@ -12,13 +12,15 @@ public class JDBCFirstStep {
     //6. close all the connection +
 
     private static final String JDBC_DRIVER = "oracle.jdbc.driver.OracleDriver";
-    private static final String DB_URL = "jdbc:oracle:thin:@gromcode-lessons.c2nwr4ze1uqa.us-east-2.rds.amazonaws.com:1521:ORCL";
+    private static final String DB_URL =
+            "jdbc:oracle:thin:@gromcode-lessons.c2nwr4ze1uqa.us-east-2.rds.amazonaws.com:1521:ORCL";
 
     private static final String USER = "main";
     private static final String PASS = "PyP2p02rIZ9uyMBpTBwW";
 
     public static void main(String[] args) {
-        try (Connection connection = DriverManager.getConnection(DB_URL, USER, PASS); Statement statement = connection.createStatement()) {
+        try (Connection connection = DriverManager.getConnection(DB_URL, USER, PASS);
+             Statement statement = connection.createStatement()) {
             try {
                 Class.forName(JDBC_DRIVER);
             } catch (ClassNotFoundException e) {
@@ -26,7 +28,7 @@ public class JDBCFirstStep {
                 return;
             }
 
-            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM Orders WHERE PRICE > 5000")) {
+            try (ResultSet resultSet = statement.executeQuery("SELECT * FROM orders WHERE price > 5000")) {
                 while (resultSet.next()) {
                     long id = resultSet.getLong(1);
                     String productName = resultSet.getString(2);

@@ -3,6 +3,7 @@ package lesson1_2;
 import java.util.Date;
 
 public class Order {
+
     private long id;
     private String productName;
     private int price;

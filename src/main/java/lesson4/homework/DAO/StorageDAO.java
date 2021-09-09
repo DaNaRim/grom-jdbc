@@ -14,21 +14,25 @@ public class StorageDAO {
 
     private static final FileDAO fileDAO = new FileDAO();
 
-    private static final String SAVE_QUERY = "INSERT INTO STORAGE VALUES (?, ?, ?, ?)";
-    private static final String FIND_BY_ID_QUERY = "SELECT * FROM STORAGE WHERE ID = ?";
-    private static final String UPDATE_QUERY = "UPDATE STORAGE SET FORMATS_SUPPORTED = ?, COUNTRY = ?, STORAGE_SIZE = ? WHERE ID = ?";
-    private static final String DELETE_QUERY = "DELETE STORAGE WHERE ID = ?";
+    private static final String QUERY_SAVE = "INSERT INTO storage VALUES (?, ?, ?, ?)";
+    private static final String QUERY_FIND_BY_ID = "SELECT * FROM storage WHERE id = ?";
+    private static final String QUERY_UPDATE =
+            "UPDATE storage"
+                    + "   SET formats_supported = ?,"
+                    + "       country = ?,"
+                    + "       storage_size = ?"
+                    + " WHERE id = ?";
+    private static final String QUERY_DELETE = "DELETE storage WHERE id = ?";
 
     public Storage save(Storage storage) throws InternalServerException {
 
-        try (PreparedStatement ps = DAOTools.getConnection().prepareStatement(SAVE_QUERY)) {
+        try (PreparedStatement ps = DAOTools.getConnection().prepareStatement(QUERY_SAVE)) {
 
             storage.setId(UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE);
 
             StringBuilder formatsSupported = new StringBuilder();
             for (String str : storage.getFormatsSupported()) {
-                formatsSupported.append(str);
-                formatsSupported.append(", ");
+                formatsSupported.append(str).append(", ");
             }
             formatsSupported.delete(formatsSupported.lastIndexOf(", "), formatsSupported.length());
 
@@ -46,7 +50,7 @@ public class StorageDAO {
 
     public Storage findById(long id) throws BadRequestException, InternalServerException {
 
-        try (PreparedStatement ps = DAOTools.getConnection().prepareStatement(FIND_BY_ID_QUERY)) {
+        try (PreparedStatement ps = DAOTools.getConnection().prepareStatement(QUERY_FIND_BY_ID)) {
 
             ps.setLong(1, id);
             ResultSet rs = ps.executeQuery();
@@ -69,12 +73,11 @@ public class StorageDAO {
 
     public Storage update(Storage storage) throws InternalServerException {
 
-        try (PreparedStatement ps = DAOTools.getConnection().prepareStatement(UPDATE_QUERY)) {
+        try (PreparedStatement ps = DAOTools.getConnection().prepareStatement(QUERY_UPDATE)) {
 
             StringBuilder formatsSupported = new StringBuilder();
             for (String str : storage.getFormatsSupported()) {
-                formatsSupported.append(str);
-                formatsSupported.append(", ");
+                formatsSupported.append(str).append(", ");
             }
             formatsSupported.delete(formatsSupported.lastIndexOf(", "), formatsSupported.length());
 
@@ -105,7 +108,7 @@ public class StorageDAO {
 
     private void delete(long id, Connection conn) throws SQLException, InternalServerException {
 
-        try (PreparedStatement ps = conn.prepareStatement(DELETE_QUERY)) {
+        try (PreparedStatement ps = conn.prepareStatement(QUERY_DELETE)) {
             conn.setAutoCommit(false);
 
             fileDAO.deleteFilesByStorage(id);

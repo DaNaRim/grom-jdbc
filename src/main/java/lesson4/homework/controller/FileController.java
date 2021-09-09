@@ -42,11 +42,13 @@ public class FileController {
 
     public void transferAll(Storage storageFrom, Storage storageTo)
             throws BadRequestException, InternalServerException {
+
         fileService.transferAll(storageFrom, storageTo);
     }
 
     public void transferFile(Storage storageFrom, Storage storageTo, long id)
             throws BadRequestException, InternalServerException {
+
         fileService.transferFile(storageFrom.getId(), storageTo, fileService.findById(id));
     }
 }

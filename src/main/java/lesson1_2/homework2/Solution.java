@@ -6,13 +6,15 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class Solution {
-    private static final String DB_URL = "jdbc:oracle:thin:@gromcode-lessons.c2nwr4ze1uqa.us-east-2.rds.amazonaws.com:1521:ORCL";
+
+    private static final String DB_URL =
+            "jdbc:oracle:thin:@gromcode-lessons.c2nwr4ze1uqa.us-east-2.rds.amazonaws.com:1521:ORCL";
     private static final String USER = "main";
     private static final String PASS = "PyP2p02rIZ9uyMBpTBwW";
 
     public ResultSet getAllProducts() {
         try (Statement statement = DriverManager.getConnection(DB_URL, USER, PASS).createStatement()) {
-            return statement.executeQuery("SELECT * FROM PRODUCT");
+            return statement.executeQuery("SELECT * FROM product");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -21,7 +23,7 @@ public class Solution {
 
     public ResultSet getProductByPrice() {
         try (Statement statement = DriverManager.getConnection(DB_URL, USER, PASS).createStatement()) {
-            return statement.executeQuery("SELECT * FROM PRODUCT WHERE PRICE <= 100");
+            return statement.executeQuery("SELECT * FROM product WHERE price <= 100");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -30,7 +32,7 @@ public class Solution {
 
     public ResultSet getProductsByDescription() {
         try (Statement statement = DriverManager.getConnection(DB_URL, USER, PASS).createStatement()) {
-            return statement.executeQuery("SELECT * FROM PRODUCT WHERE LENGTH(DESCRIPTION) > 50");
+            return statement.executeQuery("SELECT * FROM product WHERE LENGTH(description) > 50");
         } catch (SQLException e) {
             e.printStackTrace();
         }

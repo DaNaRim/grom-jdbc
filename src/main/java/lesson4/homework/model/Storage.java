@@ -1,6 +1,7 @@
 package lesson4.homework.model;
 
 public class Storage {
+
     private Long id;
     private String[] formatsSupported;
     private String storageCountry;

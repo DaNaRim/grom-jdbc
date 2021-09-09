@@ -1,6 +1,7 @@
 package lesson4.homework.model;
 
 public class File {
+
     private Long id;
     private String name;
     private String format;
