@@ -1,5 +1,7 @@
 package lesson4.homework.model;
 
+import java.util.Arrays;
+
 public class Storage {
 
     private Long id;
@@ -50,5 +52,15 @@ public class Storage {
 
     public void setStorageSize(Long storageSize) {
         this.storageSize = storageSize;
+    }
+
+    @Override
+    public String toString() {
+        return "Storage{" +
+                "id=" + id +
+                ", formatsSupported=" + Arrays.toString(formatsSupported) +
+                ", storageCountry='" + storageCountry + '\'' +
+                ", storageSize=" + storageSize +
+                '}';
     }
 }

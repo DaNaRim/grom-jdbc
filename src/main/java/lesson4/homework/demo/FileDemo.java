@@ -15,39 +15,39 @@ public class FileDemo {
 
     public static void main(String[] args) throws Exception {
 
-        File file = new File("92", "txt", 50);
-        fileController.save(file);
+        File file = new File("N6", "ttt", 20);
+        System.out.println(fileController.save(file).toString());
 
-        fileController.findById(9L);
+        System.out.println(fileController.findById(8844935201646854465L).toString());
 
-        File file2 = fileController.findById(9L);
+        File file2 = fileController.findById(8844935201646854465L);
         file2.setName("RRRR");
-        fileController.update(file2);
+        System.out.println(fileController.update(file2).toString());
 
-        fileController.delete(2055521456558983064L);
+        fileController.delete(8844935201646854465L);
 
 
-        File file3 = fileController.findById(9L);
-        Storage storage3 = storageController.findById(4L);
-        fileController.put(storage3, file3);
+        File file3 = fileController.findById(186509638922684330L);
+        Storage storage3 = storageController.findById(842915809380813828L);
+        System.out.println(fileController.put(storage3, file3).toString());
 
         List<File> files = new ArrayList<>();
-        files.add(fileController.findById(3L));
-        files.add(fileController.findById(4L));
-        files.add(fileController.findById(5L));
-        Storage storage4 = storageController.findById(3L);
+        files.add(fileController.findById(3163891295253383570L));
+        files.add(fileController.findById(186509638922684330L));
+        files.add(fileController.findById(8972624872836449380L));
+        Storage storage4 = storageController.findById(3101416146196972198L);
         fileController.putAll(storage4, files);
 
-        Storage storage5 = storageController.findById(2L);
-        File file5 = fileController.findById(8L);
-        fileController.deleteFromStorage(storage5, file5);
+        Storage storage5 = storageController.findById(3101416146196972198L);
+        File file5 = fileController.findById(3163891295253383570L);
+        System.out.println(fileController.deleteFromStorage(storage5, file5).toString());
 
-        Storage storage6 = storageController.findById(2L);
-        Storage storage61 = storageController.findById(3L);
+        Storage storage6 = storageController.findById(842915809380813828L);
+        Storage storage61 = storageController.findById(3101416146196972198L);
         fileController.transferAll(storage6, storage61);
 
-        Storage storage7 = storageController.findById(3L);
-        Storage storage71 = storageController.findById(2L);
-        fileController.transferFile(storage7, storage71, 3116545270738536768L);
+        Storage storage7 = storageController.findById(3101416146196972198L);
+        Storage storage71 = storageController.findById(842915809380813828L);
+        fileController.transferFile(storage7, storage71, 186509638922684330L);
     }
 }

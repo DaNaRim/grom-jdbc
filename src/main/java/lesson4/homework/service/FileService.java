@@ -3,6 +3,7 @@ package lesson4.homework.service;
 import lesson4.homework.DAO.FileDAO;
 import lesson4.homework.exceptions.BadRequestException;
 import lesson4.homework.exceptions.InternalServerException;
+import lesson4.homework.exceptions.NotFoundException;
 import lesson4.homework.model.File;
 import lesson4.homework.model.Storage;
 
@@ -16,20 +17,23 @@ public class FileService {
 
     public File save(File file) throws InternalServerException, BadRequestException {
         try {
-            validateSave(file.getName(), file.getSize());
-
+            validateFile(file);
+            if (!fileDAO.isNameUnique(file.getName())) {
+                throw new BadRequestException("File with name " + file.getName() + " is already exist");
+            }
             return fileDAO.save(file);
         } catch (BadRequestException e) {
-            throw new BadRequestException("Cannot save file " + file.getName() + " : " + e.getMessage());
+            throw new BadRequestException("save file with name " + file.getName() + " failed: " + e.getMessage());
         }
     }
 
-    public File findById(long id) throws BadRequestException, InternalServerException {
+    public File findById(long id) throws InternalServerException, NotFoundException {
         return fileDAO.findById(id);
     }
 
     public File update(File file) throws InternalServerException, BadRequestException {
         try {
+            validateFile(file);
             validateUpdate(file);
 
             return fileDAO.update(file);
@@ -39,13 +43,10 @@ public class FileService {
     }
 
     public void delete(long id) throws InternalServerException, BadRequestException {
-        try {
-            findById(id);
-
-            fileDAO.delete(id);
-        } catch (BadRequestException e) {
-            throw new BadRequestException("Cannot delete file " + id + " : " + e.getMessage());
+        if (!fileDAO.isExists(id)) {
+            throw new BadRequestException("Cannot delete file " + id + " : missing file with id " + id);
         }
+        fileDAO.delete(id);
     }
 
     public File put(Storage storage, File file) throws BadRequestException, InternalServerException {
@@ -64,19 +65,20 @@ public class FileService {
 
             fileDAO.putAll(storage, files);
         } catch (BadRequestException e) {
-            throw new BadRequestException("Cannot put all files in storage " + storage.getId() + " : "
+            throw new BadRequestException("Cannot put all files to storage " + storage.getId() + " : "
                     + e.getMessage());
         }
     }
 
-    public void deleteFromStorage(long storageId, File file) throws BadRequestException, InternalServerException {
+    public File deleteFromStorage(long storageId, File file) throws BadRequestException, InternalServerException {
         try {
             validateDeleteFromStorage(storageId, file.getStorage());
 
-            fileDAO.deleteFromStorage(storageId, file);
+            return fileDAO.deleteFromStorage(storageId, file);
         } catch (BadRequestException e) {
-            throw new BadRequestException("Cannot delete file " + file.getId() + " from storage " + storageId + " : " +
-                    e.getMessage());
+            throw new BadRequestException(String.format(
+                    "Cannot delete file %d from storage %d : %s",
+                    file.getId(), storageId, e.getMessage()));
         }
     }
 
@@ -87,68 +89,65 @@ public class FileService {
 
             fileDAO.transferAll(storageFrom.getId(), storageTo.getId());
         } catch (BadRequestException e) {
-            throw new BadRequestException("Cannot transfer files from storage " + storageFrom.getId() + " to storage " +
-                    storageTo.getId() + " : " + e.getMessage());
+            throw new BadRequestException(String.format(
+                    "Cannot transfer files from storage %d to storage %d : %s",
+                    storageFrom.getId(), storageTo.getId(), e.getMessage()));
         }
     }
 
-    public void transferFile(long storageFromId, Storage storageTo, File file)
+    public void transferFile(long storageFromId, Storage storageTo, long id)
             throws BadRequestException, InternalServerException {
         try {
+            File file = findById(id);
+
             validateTransferFile(storageFromId, storageTo, file);
 
             fileDAO.transferFile(storageFromId, storageTo.getId(), file.getId());
-        } catch (BadRequestException e) {
-            throw new BadRequestException("Cannot transfer file " + file.getId() + " from storage " +
-                    storageFromId + " to storage " + storageTo.getId() + " : " + e.getMessage());
+        } catch (BadRequestException | NotFoundException e) {
+            throw new BadRequestException(String.format(
+                    "Cannot transfer file %d from storage %d to storage %d : %s",
+                    id, storageFromId, storageTo.getId(), e.getMessage()));
         }
     }
 
-    private void validateSave(String fileName, long fileSize) throws BadRequestException, InternalServerException {
-        if (fileName.length() > 10) {
-            throw new BadRequestException("File name length must be <= 10");
+    private void validateFile(File file) throws BadRequestException {
+        if (file == null) {
+            throw new BadRequestException("File can`t be null");
         }
-        if (fileSize <= 0) {
-            throw new BadRequestException("File size must be > 0");
+        if (file.getName() == null
+                || file.getFormat() == null
+                || file.getSize() == null
+                || file.getSize() <= 0) {
+            throw new BadRequestException("Fields filed incorrect");
         }
-        fileDAO.checkFileName(fileName);
+        if (file.getName().length() > 10) {
+            throw new BadRequestException("Name length must be less then 11");
+        }
+        if (file.getFormat().length() > 20) {
+            throw new BadRequestException("Name length must be less then 21");
+        }
     }
 
-    private void validatePut(Storage storage, File file)
-            throws BadRequestException, InternalServerException {
-
+    private void validatePut(Storage storage, File file) throws BadRequestException, InternalServerException {
         if (file.getStorage() != null) {
-            if (file.getStorage().getId().equals(storage.getId())) {
-                throw new BadRequestException("The file is already in current storage");
-            }
-            throw new BadRequestException("The file is in another storage");
+            throw new BadRequestException("The file is in already in storage " + file.getStorage().getId());
         }
-
-        checkFormatAndSize(file.getFormat(), file.getSize(), storage);
+        validateFormatAndSize(file.getFormat(), file.getSize(), storage);
     }
 
-    private void validatePutAll(Storage storage, List<File> files)
-            throws BadRequestException, InternalServerException {
-
+    private void validatePutAll(Storage storage, List<File> files) throws BadRequestException, InternalServerException {
         long filesSize = 0;
         List<String> formats = new ArrayList<>();
-
         for (File file : files) {
 
             if (file.getStorage() != null) {
-                if (file.getStorage().getId().equals(storage.getId())) {
-                    throw new BadRequestException("The file is already in current storage");
-                }
-                throw new BadRequestException("The file is in another storage");
+                throw new BadRequestException("The file " + file.getId() + " is in already in storage");
             }
-
-            filesSize += file.getSize();
-
             if (!formats.contains(file.getFormat())) {
                 formats.add(file.getFormat());
             }
+            filesSize += file.getSize();
         }
-
         long freeSpace = storage.getStorageSize() - fileDAO.getFilesSizeByStorageId(storage.getId());
 
         if (freeSpace < filesSize) {
@@ -156,16 +155,13 @@ public class FileService {
         }
 
         List<String> storageFormats = Arrays.asList(storage.getFormatsSupported());
-
         for (String format : formats) {
-            if (!storageFormats.contains(format)) {
-                throw new BadRequestException("Unsuitable format");
-            }
+            if (storageFormats.contains(format)) continue;
+            throw new BadRequestException("Unsuitable format " + format);
         }
     }
 
     private void validateDeleteFromStorage(long storageId, Storage fileStorage) throws BadRequestException {
-
         if (fileStorage == null) {
             throw new BadRequestException("The file is not in the storage");
         }
@@ -175,24 +171,12 @@ public class FileService {
     }
 
     private void validateUpdate(File file) throws BadRequestException, InternalServerException {
-
-        if (file.getName().length() > 10) {
-            throw new BadRequestException("File name length must be <= 10");
-        }
-        if (file.getSize() <= 0) {
-            throw new BadRequestException("File size must be > 0");
-        }
-
-        String oldName = findById(file.getId()).getName();
-
+        String oldName = fileDAO.getFileName(file.getId());
         if (!oldName.equals(file.getName())) {
-            fileDAO.checkFileName(file.getName());
+            fileDAO.isNameUnique(file.getName());
         }
-
-        Storage fileStorage = file.getStorage();
-
-        if (fileStorage != null) {
-            checkFormatAndSize(file.getFormat(), file.getSize(), fileStorage);
+        if (file.getStorage() != null) {
+            validateFormatAndSize(file.getFormat(), file.getSize(), file.getStorage());
         }
     }
 
@@ -200,19 +184,15 @@ public class FileService {
             throws BadRequestException, InternalServerException {
 
         if (storageFromId == storageTo.getId()) {
-            throw new BadRequestException("Transfer to the same storage");
+            throw new BadRequestException("Can`t transfer to the same storage");
         }
-
-        String[] formatSupportedTo = storageTo.getFormatsSupported();
-
         for (String formatFrom : formatSupportedFrom) {
-            if (!Arrays.asList(formatSupportedTo).contains(formatFrom)) {
-                throw new BadRequestException("Unsuitable format");
-            }
+            if (Arrays.asList(storageTo.getFormatsSupported()).contains(formatFrom)) continue;
+            throw new BadRequestException("Unsuitable format");
         }
-
-        fileDAO.checkStorageIsEmpty(storageFromId);
-
+        if (fileDAO.isStorageEmpty(storageFromId)) {
+            throw new BadRequestException("Storage is Empty");
+        }
         long filesSizeFrom = fileDAO.getFilesSizeByStorageId(storageFromId);
         long freeSpaceTo = storageTo.getStorageSize() - fileDAO.getFilesSizeByStorageId(storageTo.getId());
 
@@ -224,6 +204,9 @@ public class FileService {
     private void validateTransferFile(long storageFromId, Storage storageTo, File file)
             throws BadRequestException, InternalServerException {
 
+        if (storageFromId == storageTo.getId()) {
+            throw new BadRequestException("Can`t transfer to the same storage");
+        }
         if (file.getStorage() == null) {
             throw new BadRequestException("The file is not in the storage");
         }
@@ -233,21 +216,16 @@ public class FileService {
         if (file.getStorage().getId().equals(storageTo.getId())) {
             throw new BadRequestException("The file is already in current storage");
         }
-
-        checkFormatAndSize(file.getFormat(), file.getSize(), storageTo);
+        validateFormatAndSize(file.getFormat(), file.getSize(), storageTo);
     }
 
-    private void checkFormatAndSize(String fileFormat, long fileSize, Storage storage)
+    private void validateFormatAndSize(String fileFormat, long fileSize, Storage storage)
             throws BadRequestException, InternalServerException {
 
-        String[] formatSupported = storage.getFormatsSupported();
-
-        if (!Arrays.asList(formatSupported).contains(fileFormat)) {
+        if (!Arrays.asList(storage.getFormatsSupported()).contains(fileFormat)) {
             throw new BadRequestException("Unsuitable format");
         }
-
         long freeSpace = storage.getStorageSize() - fileDAO.getFilesSizeByStorageId(storage.getId());
-
         if (freeSpace < fileSize) {
             throw new BadRequestException("No storage space");
         }

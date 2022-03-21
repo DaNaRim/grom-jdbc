@@ -31,7 +31,7 @@ public class Solution {
     public long testDeleteByIdPerformance() {
         long start = new Date().getTime();
 
-        try (PreparedStatement ps = getConnection().prepareStatement("DELETE FROM product WHERE ID = ?")) {
+        try (PreparedStatement ps = getConnection().prepareStatement("DELETE FROM product WHERE id = ?")) {
             for (int i = 0; i < 1000; i++) {
                 ps.setLong(1, i);
                 ps.executeUpdate();

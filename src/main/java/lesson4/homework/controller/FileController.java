@@ -2,6 +2,7 @@ package lesson4.homework.controller;
 
 import lesson4.homework.exceptions.BadRequestException;
 import lesson4.homework.exceptions.InternalServerException;
+import lesson4.homework.exceptions.NotFoundException;
 import lesson4.homework.model.File;
 import lesson4.homework.model.Storage;
 import lesson4.homework.service.FileService;
@@ -16,7 +17,7 @@ public class FileController {
         return fileService.save(file);
     }
 
-    public File findById(long id) throws BadRequestException, InternalServerException {
+    public File findById(long id) throws InternalServerException, NotFoundException {
         return fileService.findById(id);
     }
 
@@ -36,19 +37,17 @@ public class FileController {
         fileService.putAll(storage, files);
     }
 
-    public void deleteFromStorage(Storage storage, File file) throws BadRequestException, InternalServerException {
-        fileService.deleteFromStorage(storage.getId(), file);
+    public File deleteFromStorage(Storage storage, File file) throws BadRequestException, InternalServerException {
+        return fileService.deleteFromStorage(storage.getId(), file);
     }
 
     public void transferAll(Storage storageFrom, Storage storageTo)
             throws BadRequestException, InternalServerException {
-
         fileService.transferAll(storageFrom, storageTo);
     }
 
     public void transferFile(Storage storageFrom, Storage storageTo, long id)
             throws BadRequestException, InternalServerException {
-
-        fileService.transferFile(storageFrom.getId(), storageTo, fileService.findById(id));
+        fileService.transferFile(storageFrom.getId(), storageTo, id);
     }
 }

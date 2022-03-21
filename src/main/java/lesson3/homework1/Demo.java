@@ -7,9 +7,7 @@ public class Demo {
         Solution solution = new Solution();
 
         solution.findProductsByPrice(300, 100);
-
         solution.findProductsByName("test");
-
         solution.findProductsWithEmptyDescription();
     }
 }

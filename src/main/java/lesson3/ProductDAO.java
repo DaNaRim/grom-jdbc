@@ -69,7 +69,7 @@ public class ProductDAO {
     }
 
     public void delete(long id) {
-        try(PreparedStatement ps = getConnection().prepareStatement("DELETE FROM product WHERE id = ?")) {
+        try (PreparedStatement ps = getConnection().prepareStatement("DELETE FROM product WHERE id = ?")) {
             ps.setLong(1, id);
             System.out.println("Delete was finished successfully");
         } catch (SQLException e) {
@@ -79,6 +79,6 @@ public class ProductDAO {
     }
 
     private Connection getConnection() throws SQLException {
-         return DriverManager.getConnection(DB_URL, USER, PASS);
+        return DriverManager.getConnection(DB_URL, USER, PASS);
     }
 }
